@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+    <link href="~/Content/scss/main.css" rel="stylesheet" />
+    @RenderSection("styles", false)
+</head>
+<body>
+    <div id="page-container" class="sidebar-o sidebar-dark enable-page-overlay side-scroll page-header-fixed main-content-narrow">
+
+        <nav id="sidebar" aria-label="Main Navigation">
+            <!-- Side Header -->
+            <div class="bg-header-dark">
+                <div class="content-header bg-white-5">
+                    <!-- Logo -->
+                    <a class="fw-semibold text-white tracking-wide" href="/">
+                        <span class="smini-visible">
+                            D<span class="opacity-75">x</span>
+                        </span>
+                        <span class="smini-hidden">
+                            Dash<span class="opacity-75">mix</span>
+                        </span>
+                    </a>
+
+                    <!-- Options -->
+                    <div>
+                        <!-- Toggle Sidebar Style -->
+                        <button type="button" class="btn btn-sm btn-alt-secondary" data-toggle="class-toggle" data-target="#sidebar-style-toggler" data-class="fa-toggle-off fa-toggle-on" onclick="Dashmix.layout('sidebar_style_toggle');Dashmix.layout('header_style_toggle');">
+                            <i class="fa fa-toggle-off" id="sidebar-style-toggler"></i>
+                        </button>
+
+                        <!-- Dark Mode -->
+                        <button type="button" class="btn btn-sm btn-alt-secondary" data-toggle="class-toggle" data-target="#dark-mode-toggler" data-class="far fa" onclick="Dashmix.layout('dark_mode_toggle');">
+                            <i class="far fa-moon" id="dark-mode-toggler"></i>
+                        </button>
+
+                        <!-- Close Sidebar, Visible only on mobile screens -->
+                        <button type="button" class="btn btn-sm btn-alt-secondary d-lg-none" data-toggle="layout" data-action="sidebar_close">
+                            <i class="fa fa-times-circle"></i>
+                        </button>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+            <!-- Sidebar Scrolling Main Navigation -->
+            <div class="js-sidebar-scroll">
+                <!-- Side Navigation -->
+                <div class="content-side">
+                    <ul class="nav-main">
+                        <li class="nav-main-item">
+                            <a class="nav-main-link" href="be_pages_dashboard.html">
+                                <i class="nav-main-link-icon fa fa-location-arrow"></i>
+                                <span class="nav-main-link-name">Dashboard</span>
+                                <span class="nav-main-link-badge badge rounded-pill bg-primary">8</span>
+                            </a>
+                        </li>
+                        <li class="nav-main-heading">Base</li>
+                        <li class="nav-main-item">
+                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                <i class="nav-main-link-icon fa fa-border-all"></i>
+                                <span class="nav-main-link-name">Blocks</span>
+                            </a>
+                            <ul class="nav-main-submenu">
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link" href="be_blocks_styles.html">
+                                        <span class="nav-main-link-name">Styles</span>
+                                    </a>
+                                </li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link" href="be_blocks_options.html">
+                                        <span class="nav-main-link-name">Options</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        @Html.Partial("_Header")
+
+        <!-- Main Container -->
+        <main id="main-container">
+           
+            <!-- Page Content -->
+            <div class="content">
+                @RenderBody()
+            </div>
+
+        </main>
+
+        @Html.Partial("_Fotter")
+
+    </div>
+
+
+    @*<script src="~/Content/_js/main/app.js"></script>*@
+    <script src="~/Content/js/dashmix.app.min.js"></script>
+    <script src="~/Content/js/lib/jquery.min.js"></script>
+    
+    @RenderSection("scripts", false)
+</body>
+</html>

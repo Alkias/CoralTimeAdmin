@@ -1,0 +1,46 @@
+﻿@model DayOfTask
+
+@{
+    ViewBag.Title = "GetDayTasks";
+}
+<div class="block block-rounded">
+    <div class="block-content">
+        <!-- Inline Layout -->
+        <h2 class="content-heading">Day Task</h2>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <p class="text-muted">
+                    Using an inline layout can come really handy for small forms
+                </p>
+            </div>
+            <div id="divEmp" class="col-lg-8 space-y-2">
+                @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Mitsos" }, new { @class = "row row-cols-lg-auto g-3 align-items-center" }))
+                {
+                    <div class="col-12">
+                        @Html.LabelFor(model => model.TaskDay, htmlAttributes: new { @class = "visually-hidden" })
+                        @Html.TextBoxFor(model => model.TaskDay, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" } )
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div id="Mitsos"></div>
+
+
+    @section styles {
+        <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
+        <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
+    }
+
+    @section scripts {
+        <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+        <script src="~/Scripts/jquery.inputmask.min.js"></script>
+        <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+        <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
+        <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    }
