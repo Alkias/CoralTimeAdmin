@@ -162,7 +162,10 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="DAL\Entities\Client.cs" />
     <Compile Include="DAL\Entities\Project.cs" />
+    <Compile Include="DAL\Entities\TaskType.cs" />
+    <Compile Include="Models\BaseWebEntityModel.cs" />
     <Compile Include="Models\DayOfTask.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Models\SystemEvents.cs" />
@@ -178,6 +181,7 @@
     <Compile Include="Helpers\DecimalModelBinder.cs" />
     <Compile Include="Models\DayTasks.cs" />
     <Compile Include="DAL\Entities\IBaseEntity.cs" />
+    <Compile Include="Models\TimeEntriesModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\DapperRepository.cs" />
     <Compile Include="Repositories\IDapperRepository.cs" />
@@ -4362,6 +4366,7 @@
     <Content Include="Views\Home\UpdateTimeEntry.cshtml" />
     <Content Include="Views\Shared\_Header.cshtml" />
     <Content Include="Views\Shared\_Fotter.cshtml" />
+    <Content Include="Views\Home\CreateTimeEntry.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

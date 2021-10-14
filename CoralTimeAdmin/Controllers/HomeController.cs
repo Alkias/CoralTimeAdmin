@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using CoralTimeAdmin.DAL.Entities;
@@ -16,6 +18,7 @@ namespace CoralTimeAdmin.Controllers
         #region Fields
 
         private readonly IDapperRepository _dapper;
+        private string _creatorId = "7982c3af-5da6-447d-ab5a-7fda12d750c1";
 
         #endregion
 
@@ -29,10 +32,38 @@ namespace CoralTimeAdmin.Controllers
 
         #region Methods
 
-        public ActionResult Index(DateTime? date) {
+        public ActionResult Index (DateTime? date) {
             var model = new DayOfTask();
             model.TaskDay = date ?? DateTime.Now;
 
+            return View(model);
+        }
+
+        public async Task<ActionResult> CreateTimeEntry() {
+            var model = new TimeEntriesModel();
+            
+            await PrepareTimeEntryModelSelectionLists(model);
+
+            PrepareTimeEntryModel(model);
+
+            return View(model);
+        }
+
+        private void PrepareTimeEntryModel (TimeEntriesModel model) {
+            model.CreatorId = _creatorId;
+            model.LastEditorUserId = _creatorId;
+            model.Date = DateTime.Now;
+            model.CreationDate = DateTime.Now;
+            model.LastUpdateDate = DateTime.Now;
+            model.TimeTimerStart = -1;
+            model.TimeEstimated = 0;
+            model.MemberId = 1;
+
+        }
+
+        [HttpPost]
+        public ActionResult CreateTimeEntry (TimeEntriesModel model) {
+            
             return View(model);
         }
 
@@ -62,8 +93,6 @@ namespace CoralTimeAdmin.Controllers
             return View(dayTask);
         }
 
-       
-
         [HttpPost]
         public async Task<ActionResult> UpdateTimeEntry (DayTasks model) {
             var rnd = new Random();
@@ -81,12 +110,10 @@ namespace CoralTimeAdmin.Controllers
 
         [HttpPost]
         public async Task<ActionResult> DeleteTimeEntry (int id) {
-
             var timeEntry = await GetTimeEntryFromId(id);
 
             if (timeEntry != null) {
-                
-                var result = await _dapper.ExecSql<TimeEntries>("DELETE FROM TimeEntries WHERE Id = @id", new{id=id});
+                var result = await _dapper.ExecSql<TimeEntries>("DELETE FROM TimeEntries WHERE Id = @id", new {id});
 
                 return RedirectToAction("Index", timeEntry.Date);
             }
@@ -94,25 +121,14 @@ namespace CoralTimeAdmin.Controllers
             var model = await GetDayTaskById(id);
 
             return RedirectToAction("Index", model.Date);
-
-        }
-
-        private async Task<TimeEntries> GetTimeEntryFromId (int id) {
-            var parameters = new DynamicParameters(
-                new {
-                    timeEntryId = id
-                });
-
-           var execResult = await _dapper.ExecScalarSql<TimeEntries>("SELECT * FROM TimeEntries WHERE id=@id", parameters);
-            
-           return execResult;
         }
 
         #endregion
 
         #region Privates
-        private async Task<DayTasks> GetDayTaskById(int id) {
-            var sqlParams = new DynamicParameters(new { id });
+
+        private async Task<DayTasks> GetDayTaskById (int id) {
+            var sqlParams = new DynamicParameters(new {id});
             var result = await _dapper.ExecProc<DayTasks>("GetEntryById", sqlParams);
 
             var timeEntry = result.FirstOrDefault();
@@ -155,6 +171,98 @@ namespace CoralTimeAdmin.Controllers
                 EventEnd = mitsos.Last().TimeGenerated.ToString("hh:mm:ss")
             };
         }
+
+        private async Task<TimeEntries> GetTimeEntryFromId (int id) {
+            var parameters = new DynamicParameters(
+                new {
+                    timeEntryId = id
+                });
+
+            var execResult = await _dapper.ExecScalarSql<TimeEntries>("SELECT * FROM TimeEntries WHERE id=@id", parameters);
+
+            return execResult;
+        }
+
+        private void EntityToModel(TimeEntries entity, TimeEntriesModel model)
+        {
+            model.CreationDate = entity.CreationDate;
+            model.CreatorId = entity.CreatorId;
+            model.Date = entity.Date;
+            model.Description = entity.Description;
+            model.IsFromToShow = entity.IsFromToShow;
+            model.LastEditorUserId = entity.LastEditorUserId;
+            model.LastUpdateDate = entity.LastUpdateDate;
+            model.MemberId = entity.MemberId;
+            model.TimeEstimated = entity.TimeEstimated;
+            model.ProjectId = entity.ProjectId;
+            model.TaskTypesId = entity.TaskTypesId;
+            model.TimeActual = entity.TimeActual;
+            model.TimeFrom = entity.TimeFrom;
+            model.TimeTimerStart = entity.TimeTimerStart;
+            model.TimeTo = entity.TimeTo;
+        }
+
+
+        private void ModelToEntity(TimeEntriesModel model, TimeEntries entity)
+        {
+            entity.CreationDate = model.CreationDate;
+            entity.CreatorId = model.CreatorId;
+            entity.Date = model.Date;
+            entity.Description = model.Description;
+            entity.IsFromToShow = model.IsFromToShow;
+            entity.LastEditorUserId = model.LastEditorUserId;
+            entity.LastUpdateDate = model.LastUpdateDate;
+            entity.MemberId = model.MemberId;
+            entity.TimeEstimated = model.TimeEstimated;
+            entity.ProjectId = model.ProjectId;
+            entity.TaskTypesId = model.TaskTypesId;
+            entity.TimeActual = model.TimeActual;
+            entity.TimeFrom = model.TimeFrom;
+            entity.TimeTimerStart = model.TimeTimerStart;
+            entity.TimeTo = model.TimeTo;
+        }
+
+        [NonAction]
+        private async Task PrepareTimeEntryModelSelectionLists(TimeEntriesModel model)
+        {
+            if (model == null)
+                throw new ArgumentNullException("model");
+
+            var availableProjects = await GetProjects();
+            var availableTaskTypes = await GetTaskTypes();
+
+
+            foreach (var project in availableProjects) {
+                model.AvailableProjects.Add(
+                    new SelectListItem {
+                        Text = project.Name,
+                        Value = project.Id.ToString()
+                    });
+            }
+
+            foreach (var type in availableTaskTypes) {
+                model.AvailableTasks.Add(
+                    new SelectListItem {
+                        Text = type.Name,
+                        Value = type.Id.ToString()
+                    });
+            }
+
+
+        }
+
+        private async Task<List<Project>> GetProjects() {
+            var execResult = await _dapper.ExecSql<Project>("SELECT * FROM Projects");
+
+            return execResult.ToList();
+        }
+
+        private async Task<List<TaskType>> GetTaskTypes() {
+            var execResult = await _dapper.ExecSql<TaskType>("SELECT * FROM TaskTypes");
+
+            return execResult.ToList();
+        }
+
 
         #endregion
     }

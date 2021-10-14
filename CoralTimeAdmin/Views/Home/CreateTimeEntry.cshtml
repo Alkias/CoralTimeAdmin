@@ -1,0 +1,159 @@
+﻿@model TimeEntriesModel
+@{
+    ViewBag.Title = "CreateTimeEntry";
+}
+
+<div class="block block-rounded">
+    <div class="block-header block-header-default block-header-rtl">
+        <h3 class="block-title">@ViewBag.Title</h3>
+    </div>
+    <div class="block-content">
+        <div class="row">
+            <div class="col-lg-4">
+                <p class="text-muted">
+                    An often used layout which is very easy to create with minimal markup
+
+                </p>
+            </div>
+            <div class="col-lg-8 col-xl-5">
+                @using (Html.BeginForm("CreateTimeEntry", "Home", FormMethod.Post, new { @class = "mb-5" }))
+                {
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.CreatorId)
+                    @Html.HiddenFor(model => model.TimeTimerStart)
+                    @Html.HiddenFor(model => model.TimeEstimated)
+                    @Html.HiddenFor(model => model.MemberId)
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(model => model.Date, "{0:dd/MM/yyyy HH:m:s}", new
+                            {
+                                @class = "js-flatpickr form-control",
+                                data_enable_time = "true",
+                                data_enable_seconds = "true",
+                                data_minute_increment = "1",
+                                data_date_format = "d/m/y H:i:S"
+                            })
+
+                            @*<input class="js-flatpickr form-control" 
+                                   data-date-format="HH:ii:SS" 
+                                   data-enable-seconds="true" 
+                                   data-enable-time="true" 
+                                   data-minute-increment="1" 
+                                   data-val="true" 
+                                   data-val-date="The field Date must be a date." 
+                                   data-val-required="The Date field is required." 
+                                   id="Date" 
+                                   name="Date" 
+                                   type="text" 
+                                   value="@Model.Date.ToString("dd/MM/yyyy HH:mm:ss")"
+                                   data-time_24hr="true">*@
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.LastUpdateDate, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(model => model.LastUpdateDate, "{0:dd/MM/yyyy hh:mm:ss}", new {
+                                @class = "js-flatpickr form-control",
+                                data_enable_time = "true",
+                                data_enable_seconds = "true",
+                                data_minute_increment = "1",
+                                data_date_format = "d/m/y H:i:S"
+                            })
+                        </div>
+                    </div>
+
+                    @*<div class="row mb-4">
+                        @Html.LabelFor(model => model.CreationDate, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.CreationDate, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>*@
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.ProjectId, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.DropDownListFor(model => model.ProjectId, Model.AvailableProjects, new { @class = "form-select" })
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.TaskTypesId, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.DropDownListFor(model => model.TaskTypesId, Model.AvailableTasks, new { @class = "form-select" })
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.TextAreaFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.IsFromToShow, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.IsFromToShow, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.LastEditorUserId, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.LastEditorUserId, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+
+                    
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.TimeFrom, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.TimeFrom, new {htmlAttributes = new {
+                                @class = "js-flatpickr form-control",
+                                data_enable_time="true",
+                                data_no_calendar="true",
+                                data_enable_seconds="true",
+                                data_minute_increment="1",
+                                data_date_format ="H:i:S"
+                            }})
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        @Html.LabelFor(model => model.TimeTo, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.TimeTo, new {htmlAttributes = new {
+                                @class = "js-flatpickr form-control",
+                                data_enable_time = "true",
+                                data_no_calendar = "true",
+                                data_enable_seconds = "true",
+                                data_minute_increment = "1",
+                                data_date_format = "H:i:S"
+                            }})
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section styles {
+    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet"/>
+    <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet"/>
+}
+
+@section scripts {
+    <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
+    <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+}
