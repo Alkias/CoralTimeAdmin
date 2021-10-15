@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -62,6 +63,12 @@ namespace CoralTimeAdmin
             // Register Context
             //builder.RegisterType<EmulatorContext>().InstancePerRequest();
 
+            //builder.RegisterType<CoralTimeContext>().InstancePerRequest();
+            //builder.Register<IDbContext>(c => new CoralTimeContext()).InstancePerLifetimeScope();
+            var conString = WebConfigurationManager.ConnectionStrings["CoralTimeContext"].ConnectionString;
+
+            builder.Register<IDbContext>(c => new CoralTimeContext(conString)).InstancePerLifetimeScope();
+
             //controllers
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
@@ -78,6 +85,7 @@ namespace CoralTimeAdmin
             #endregion
 
             //Repositories
+            builder.RegisterGeneric(typeof(EfRepository<>)).As(typeof(IRepository<>)).InstancePerLifetimeScope();
             builder.RegisterType<DapperRepository>().As<IDapperRepository>().InstancePerLifetimeScope();
 
             var container = builder.Build();

@@ -2,9 +2,9 @@
 
 namespace CoralTimeAdmin.DAL.Entities
 {
-    public class TimeEntries
+    public class TimeEntries : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public DateTime CreationDate { get; set; }
 

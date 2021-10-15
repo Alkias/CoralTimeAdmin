@@ -183,8 +183,12 @@
     <Compile Include="DAL\Entities\IBaseEntity.cs" />
     <Compile Include="Models\TimeEntriesModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\CoralTimeContext.cs" />
     <Compile Include="Repositories\DapperRepository.cs" />
+    <Compile Include="Repositories\EfRepository.cs" />
     <Compile Include="Repositories\IDapperRepository.cs" />
+    <Compile Include="Repositories\IDbContext.cs" />
+    <Compile Include="Repositories\IRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\js\dashmix.app.min.js" />
