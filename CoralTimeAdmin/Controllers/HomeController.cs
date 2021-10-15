@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using CoralTimeAdmin.DAL.Entities;
-using CoralTimeAdmin.Helpers;
 using CoralTimeAdmin.Models;
 using CoralTimeAdmin.Repositories;
 using Dapper;
@@ -26,7 +24,7 @@ namespace CoralTimeAdmin.Controllers
 
         #region Ctor
 
-        public HomeController(IDapperRepository dapper, IRepository<TimeEntries> repository) {
+        public HomeController (IDapperRepository dapper, IRepository<TimeEntries> repository) {
             _dapper = dapper;
             _repository = repository;
         }
@@ -44,7 +42,7 @@ namespace CoralTimeAdmin.Controllers
 
         public async Task<ActionResult> CreateTimeEntry() {
             var model = new TimeEntriesModel();
-            
+
             await PrepareTimeEntryModelSelectionLists(model);
 
             PrepareTimeEntryModel(model);
@@ -52,31 +50,13 @@ namespace CoralTimeAdmin.Controllers
             return View(model);
         }
 
-        private void PrepareTimeEntryModel (TimeEntriesModel model) {
-            model.CreatorId = _creatorId;
-            model.LastEditorUserId = _creatorId;
-            model.Date = DateTime.Now;
-            model.CreationDate = DateTime.Now;
-            model.LastUpdateDate = DateTime.Now;
-            model.TimeTimerStart = -1;
-            model.TimeEstimated = 0;
-            model.MemberId = 1;
-            model.IsFromToShow = true;
-
-        }
-
-
         [HttpPost]
-        public ActionResult CreateTimeEntry(TimeEntriesModel model)
-        {
-            
-
+        public ActionResult CreateTimeEntry (TimeEntriesModel model) {
             DateTime _timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
             DateTime _timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
 
-
-            model.TimeFrom = (int)(_timeFrom - model.Date.Date).TotalSeconds;
-            model.TimeTo = (int)(_timeTo - model.Date.Date).TotalSeconds;
+            model.TimeFrom = (int) (_timeFrom - model.Date.Date).TotalSeconds;
+            model.TimeTo = (int) (_timeTo - model.Date.Date).TotalSeconds;
             model.TimeActual = model.TimeTo - model.TimeFrom;
 
             model.Date = model.Date.Date;
@@ -85,87 +65,11 @@ namespace CoralTimeAdmin.Controllers
 
             TimeEntries timeEntries = new TimeEntries();
             ModelToEntity(model, timeEntries);
-            
+
             _repository.Insert(timeEntries);
 
-            //await PrepareTimeEntryModelSelectionLists(model);
-
-            return RedirectToAction("UpdateTimeEntry", new { id = timeEntries.Id });
+            return RedirectToAction("UpdateTimeEntry", new {id = timeEntries.Id});
         }
-
-
-        [HttpPost]
-        public async Task<ActionResult> CreateTimeEntry_DD (TimeEntriesModel model) {
-
-            DateTime _timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
-            DateTime _timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
-
-            
-            model.TimeFrom = (int) (_timeFrom - model.Date.Date ).TotalSeconds;
-            model.TimeTo = (int)(_timeTo - model.Date.Date).TotalSeconds;
-            model.TimeActual = model.TimeTo - model.TimeFrom;
-
-            model.Date = _timeFrom; 
-            model.LastUpdateDate = _timeTo;
-
-            var parameters = new DynamicParameters(new {
-                CreationDate  = model.Date.ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                CreatorId = model.CreatorId,
-                Date = model.Date.ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                Description = model.Description,
-                IsFromToShow = model.IsFromToShow,
-                LastEditorUserId = model.LastEditorUserId,
-                LastUpdateDate = model.LastUpdateDate.ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                MemberId = model.MemberId,
-                TimeEstimated = model.TimeEstimated,
-                ProjectId = model.ProjectId,
-                TaskTypesId = model.TaskTypesId,
-                TimeActual = model.TimeActual,
-                TimeFrom = model.TimeFrom,
-                TimeTimerStart = model.TimeTimerStart,
-                TimeTo = model.TimeTo
-            });
-
-            var sql = $@"insert into TimeEntries (
-                        CreationDate,
-                        CreatorId,
-                        [Date],
-                        [Description],
-                        IsFromToShow,
-                        LastEditorUserId,
-                        LastUpdateDate,
-                        MemberId,
-                        TimeEstimated, 
-                        ProjectId,
-                        TaskTypesId,
-                        TimeActual,
-                        TimeFrom,
-                        TimeTimerStart,
-                        TimeTo
-                    ) Values(
-                        @CreationDate,
-                        @CreatorId,
-                        @Date,
-                        @Description,
-                        @IsFromToShow,
-                        @LastEditorUserId,
-                        @LastUpdateDate,
-                        @MemberId,
-                        @TimeEstimated,
-                        @ProjectId,
-                        @TaskTypesId,
-                        @TimeActual,
-                        @TimeFrom,
-                        @TimeTimerStart,
-                        @TimeTo)";
-
-            var result = await _dapper.ExecNonQuery(sql, parameters);
-
-            await PrepareTimeEntryModelSelectionLists(model);
-
-            return RedirectToAction("UpdateTimeEntry", new { id = model.Id });
-        }
-        
 
         [HttpPost]
         public async Task<ActionResult> GetDayTasksResult (DayOfTask model) {
@@ -227,12 +131,36 @@ namespace CoralTimeAdmin.Controllers
 
         #region Privates
 
+        private void EntityToModel (TimeEntries entity, TimeEntriesModel model) {
+            model.CreationDate = entity.CreationDate;
+            model.CreatorId = entity.CreatorId;
+            model.Date = entity.Date;
+            model.Description = entity.Description;
+            model.IsFromToShow = entity.IsFromToShow;
+            model.LastEditorUserId = entity.LastEditorUserId;
+            model.LastUpdateDate = entity.LastUpdateDate;
+            model.MemberId = entity.MemberId;
+            model.TimeEstimated = entity.TimeEstimated;
+            model.ProjectId = entity.ProjectId;
+            model.TaskTypesId = entity.TaskTypesId;
+            model.TimeActual = entity.TimeActual;
+            model.TimeFrom = entity.TimeFrom;
+            model.TimeTimerStart = entity.TimeTimerStart;
+            model.TimeTo = entity.TimeTo;
+        }
+
         private async Task<DayTasks> GetDayTaskById (int id) {
             var sqlParams = new DynamicParameters(new {id});
             var result = await _dapper.ExecProc<DayTasks>("GetEntryById", sqlParams);
 
             var timeEntry = result.FirstOrDefault();
             return timeEntry;
+        }
+
+        private async Task<List<Project>> GetProjects() {
+            var execResult = await _dapper.ExecSql<Project>("SELECT * FROM Projects WHERE IsActive=1 Order by Name");
+
+            return execResult.ToList();
         }
 
         private SystemEvents GetSystemEvents (DayTasks timeEntry) {
@@ -272,6 +200,12 @@ namespace CoralTimeAdmin.Controllers
             };
         }
 
+        private async Task<List<TaskType>> GetTaskTypes() {
+            var execResult = await _dapper.ExecSql<TaskType>("SELECT * FROM TaskTypes WHERE IsActive=1 Order by Name");
+
+            return execResult.ToList();
+        }
+
         private async Task<TimeEntries> GetTimeEntryFromId (int id) {
             var parameters = new DynamicParameters(
                 new {
@@ -283,28 +217,7 @@ namespace CoralTimeAdmin.Controllers
             return execResult;
         }
 
-        private void EntityToModel(TimeEntries entity, TimeEntriesModel model)
-        {
-            model.CreationDate = entity.CreationDate;
-            model.CreatorId = entity.CreatorId;
-            model.Date = entity.Date;
-            model.Description = entity.Description;
-            model.IsFromToShow = entity.IsFromToShow;
-            model.LastEditorUserId = entity.LastEditorUserId;
-            model.LastUpdateDate = entity.LastUpdateDate;
-            model.MemberId = entity.MemberId;
-            model.TimeEstimated = entity.TimeEstimated;
-            model.ProjectId = entity.ProjectId;
-            model.TaskTypesId = entity.TaskTypesId;
-            model.TimeActual = entity.TimeActual;
-            model.TimeFrom = entity.TimeFrom;
-            model.TimeTimerStart = entity.TimeTimerStart;
-            model.TimeTo = entity.TimeTo;
-        }
-
-
-        private void ModelToEntity(TimeEntriesModel model, TimeEntries entity)
-        {
+        private void ModelToEntity (TimeEntriesModel model, TimeEntries entity) {
             entity.CreationDate = model.CreationDate;
             entity.CreatorId = model.CreatorId;
             entity.Date = model.Date;
@@ -322,15 +235,25 @@ namespace CoralTimeAdmin.Controllers
             entity.TimeTo = model.TimeTo;
         }
 
+        private void PrepareTimeEntryModel (TimeEntriesModel model) {
+            model.CreatorId = _creatorId;
+            model.LastEditorUserId = _creatorId;
+            model.Date = DateTime.Now;
+            model.CreationDate = DateTime.Now;
+            model.LastUpdateDate = DateTime.Now;
+            model.TimeTimerStart = -1;
+            model.TimeEstimated = 0;
+            model.MemberId = 1;
+            model.IsFromToShow = true;
+        }
+
         [NonAction]
-        private async Task PrepareTimeEntryModelSelectionLists(TimeEntriesModel model)
-        {
+        private async Task PrepareTimeEntryModelSelectionLists (TimeEntriesModel model) {
             if (model == null)
                 throw new ArgumentNullException("model");
 
             var availableProjects = await GetProjects();
             var availableTaskTypes = await GetTaskTypes();
-
 
             foreach (var project in availableProjects) {
                 model.AvailableProjects.Add(
@@ -347,22 +270,7 @@ namespace CoralTimeAdmin.Controllers
                         Value = type.Id.ToString()
                     });
             }
-
-
         }
-
-        private async Task<List<Project>> GetProjects() {
-            var execResult = await _dapper.ExecSql<Project>("SELECT * FROM Projects WHERE IsActive=1 Order by Name");
-
-            return execResult.ToList();
-        }
-
-        private async Task<List<TaskType>> GetTaskTypes() {
-            var execResult = await _dapper.ExecSql<TaskType>("SELECT * FROM TaskTypes WHERE IsActive=1 Order by Name");
-
-            return execResult.ToList();
-        }
-
 
         #endregion
     }
