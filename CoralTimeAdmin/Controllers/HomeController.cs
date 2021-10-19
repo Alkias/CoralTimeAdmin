@@ -71,6 +71,16 @@ namespace CoralTimeAdmin.Controllers
             return RedirectToAction("UpdateTimeEntry", new {id = timeEntries.Id});
         }
 
+        
+        public ActionResult DeleteTimeEntry(int id) {
+
+            var timeEntries = _repository.GetById(id);
+
+            _repository.Delete(timeEntries);
+
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
         public async Task<ActionResult> GetDayTasksResult (DayOfTask model) {
             var aDate = model.TaskDay;
@@ -112,20 +122,20 @@ namespace CoralTimeAdmin.Controllers
             return RedirectToAction("UpdateTimeEntry", new {id = model.Id});
         }
 
-        [HttpPost]
-        public async Task<ActionResult> DeleteTimeEntry (int id) {
-            var timeEntry = await GetTimeEntryFromId(id);
+        //[HttpPost]
+        //public async Task<ActionResult> DeleteTimeEntry (int id) {
+        //    var timeEntry = await GetTimeEntryFromId(id);
 
-            if (timeEntry != null) {
-                var result = await _dapper.ExecSql<TimeEntries>("DELETE FROM TimeEntries WHERE Id = @id", new {id});
+        //    if (timeEntry != null) {
+        //        var result = await _dapper.ExecSql<TimeEntries>("DELETE FROM TimeEntries WHERE Id = @id", new {id});
 
-                return RedirectToAction("Index", timeEntry.Date);
-            }
+        //        return RedirectToAction("Index", timeEntry.Date);
+        //    }
 
-            var model = await GetDayTaskById(id);
+        //    var model = await GetDayTaskById(id);
 
-            return RedirectToAction("Index", model.Date);
-        }
+        //    return RedirectToAction("Index", model.Date);
+        //}
 
         #endregion
 
