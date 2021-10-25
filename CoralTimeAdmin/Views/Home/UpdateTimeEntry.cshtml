@@ -6,7 +6,8 @@
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
-            @Html.ActionLink("Create New", "CreateTimeEntry", "", htmlAttributes: new { @class = "btn btn-sm btn-primary" })
+            <a href="@Url.Action("Index", new{date=Model.Date})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
+            <a href="@Url.Action("CreateTimeEntry")" class="btn btn-sm btn-success me-1"><i class="fa fa-fw fa-plus me-1"></i> Create New</a>
         </div>
     </div>
     <div class="block-content">
@@ -14,9 +15,16 @@
             <div class="col-lg-4">
                 <p class="text-muted">
                     An often used layout which is very easy to create with minimal markup
-                    <br/>Events Start @Model.EventStart
-                    <br/>Events End @Model.EventEnd
                 </p>
+                <div class="row items-push text-center text-sm-start mb-12">
+                    <div class="col-sm-12 col-xl-12">
+                        <button id="get-events" class="btn btn-sm btn-alt-primary">Get Events</button>
+                    </div>
+                    <div class="col-sm-12 col-xl-12">
+                        <a id="event-start" class="btn btn-sm btn-alt-primary push" href="javascript:void(0)">Start: <span id="event-start-val"></span></a> 
+                        <a id="event-end" class="btn btn-sm btn-alt-primary push" href="javascript:void(0)">End: <span id="event-end-val"></span></a>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-8 col-xl-5">
                 @using (Html.BeginForm("UpdateTimeEntry", "Home", FormMethod.Post, new {@class = "mb-5"})) {
@@ -75,4 +83,55 @@
     <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
     <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    <script>
+        $(function () {
+            $("#event-start").hide();
+            $("#event-end").hide();;
+            $(document).on("click", "#get-events", function () {
+
+                // Clear old events
+                $("#event-start-val").text("").hide();
+                $("#event-end-val").text("").hide();;
+
+                Dashmix.layout('header_loader_on');
+
+                $.ajax({
+                    method : "POST",
+                    url : "@Url.Action("GetSystemEvents", "Home")",
+                    data: { daytime : "@Model.Date" }
+                }).done(function (msg) {
+                        Dashmix.layout('header_loader_off');
+
+                    if (msg.EventStart && msg.EventStart != "") {
+                       
+                        $("#event-start").show();
+                        $("#event-start-val").text(msg.EventStart).show();
+                       
+                    }
+                            
+                    if (msg.EventEnd && msg.EventEnd != "") {
+                        
+                        $("#event-end").show();
+                        $("#event-end-val").text(msg.EventEnd).show();
+                    }
+                           
+                });
+            });
+
+            $(document).on("click", "#event-start", function ()
+            {
+                
+                $("#FromTime").val($(this).find("#event-start-val").text());
+                var data = $("#event-start-val").text();
+                $("#FromTime").flatpickr("set", "enable", data);
+            });
+
+            $(document).on("click", "#event-end", function ()
+            {
+                $("#ToTime").val($(this).find("#event-end-val").text());
+                var data = $("#event-end-val").text();
+                $("#ToTime").flatpickr("set", "enable", data);
+            });
+        })
+    </script>
 }

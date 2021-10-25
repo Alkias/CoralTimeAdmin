@@ -15,7 +15,7 @@
                 </p>
             </div>
             <div id="divEmp" class="col-lg-8 space-y-2">
-                @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "TasksData" }, new { @class = "row row-cols-lg-auto g-3 align-items-center" }))
+                @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "TasksData" }, new { @class = "row row-cols-lg-auto g-3 align-items-center", id="form-index" }))
                 {
                     <div class="col-12">
                         @Html.LabelFor(model => model.TaskDay, htmlAttributes: new { @class = "visually-hidden" })
@@ -48,7 +48,10 @@
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
     <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
     <script>
-            $(function() {
+        $(function () {
+
+            $( "#form-index" ).submit();
+
                 $(document).on("click", "#TasksData #deleteBtn", function() {
                     var taskId = $(this).attr("data-id");
 
@@ -76,8 +79,7 @@
                         }
                     })
 
-                    @*var href = "@Url.Action("DeleteTimeEntry", "Home")" + "/" + taskId;
-                    window.location.href = href;*@
+                   
                 });
             })
     </script>

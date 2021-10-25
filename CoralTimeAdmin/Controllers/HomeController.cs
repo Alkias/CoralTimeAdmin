@@ -80,7 +80,7 @@ namespace CoralTimeAdmin.Controllers
 
             Success("Time Entry Deleted Successfully");
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new{date= timeEntries.Date});
         }
 
         [HttpPost]
@@ -96,9 +96,9 @@ namespace CoralTimeAdmin.Controllers
             var dayTask = await GetDayTaskById(id);
 
             if (dayTask != null) {
-                var systemEvents = GetSystemEvents(dayTask);
-                dayTask.EventStart = systemEvents.EventStart;
-                dayTask.EventEnd = systemEvents.EventEnd;
+                //var systemEvents = GetSystemEvents(dayTask);
+                //dayTask.EventStart = systemEvents.EventStart;
+                //dayTask.EventEnd = systemEvents.EventEnd;
 
                 dayTask.FromTime = dayTask.FromTime.Replace(":000", "");
                 dayTask.ToTime = dayTask.ToTime.Replace(":000", "");
@@ -126,6 +126,43 @@ namespace CoralTimeAdmin.Controllers
             Success("Time Entry Updated Successfully");
 
             return RedirectToAction("UpdateTimeEntry", new {id = model.Id});
+        }
+
+        [HttpPost]
+        public ActionResult GetSystemEvents (string daytime) {
+            var cultureInfo = new CultureInfo("el-GR");
+            var eventDate = DateTime.ParseExact(
+                daytime,
+                "MM/dd/yyyy hh:mm:ss",
+                CultureInfo.InvariantCulture);
+
+
+            string eventLogName = "System";
+            string sourceName = "EventLoggingApp";
+            string machineName = "INTELLI15-PC";
+
+            EventLog eventLog = new EventLog();
+            eventLog.Log = eventLogName;
+            eventLog.Source = sourceName;
+            eventLog.MachineName = machineName;
+
+            var allLogs = eventLog.Entries;
+
+            var mitsos = allLogs.Cast<EventLogEntry>()
+                .Where(x => x.TimeGenerated.Date == eventDate.Date)
+                .Select(
+                    x => new {
+                        x.MachineName,
+                        x.Site,
+                        x.Source,
+                        x.Message,
+                        x.TimeGenerated,
+                    }).ToList();
+
+            return Json(new {
+                EventStart = mitsos.First().TimeGenerated.ToString("HH:mm:ss"),
+                EventEnd = mitsos.Last().TimeGenerated.ToString("HH:mm:ss")
+            });
         }
 
         #endregion
@@ -164,7 +201,7 @@ namespace CoralTimeAdmin.Controllers
             return execResult.ToList();
         }
 
-        private SystemEvents GetSystemEvents (DayTasks timeEntry) {
+        private SystemEvents GetSystemEvents_DD (DayTasks timeEntry) {
             var cultureInfo = new CultureInfo("el-GR");
 
             //10/11/2021 00:00:00
