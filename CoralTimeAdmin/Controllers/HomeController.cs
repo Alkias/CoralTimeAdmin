@@ -12,7 +12,7 @@ using Dapper;
 
 namespace CoralTimeAdmin.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         #region Fields
 
@@ -78,6 +78,8 @@ namespace CoralTimeAdmin.Controllers
 
             _repository.Delete(timeEntries);
 
+            Success("Time Entry Deleted Successfully");
+
             return RedirectToAction("Index");
         }
 
@@ -101,6 +103,8 @@ namespace CoralTimeAdmin.Controllers
                 dayTask.FromTime = dayTask.FromTime.Replace(":000", "");
                 dayTask.ToTime = dayTask.ToTime.Replace(":000", "");
 
+                
+
                 return View(dayTask);
             }
 
@@ -119,23 +123,10 @@ namespace CoralTimeAdmin.Controllers
                 });
             var result = await _dapper.ExecProc<DayTasks>("UpdateTimeEntry", parameters);
 
+            Success("Time Entry Updated Successfully");
+
             return RedirectToAction("UpdateTimeEntry", new {id = model.Id});
         }
-
-        //[HttpPost]
-        //public async Task<ActionResult> DeleteTimeEntry (int id) {
-        //    var timeEntry = await GetTimeEntryFromId(id);
-
-        //    if (timeEntry != null) {
-        //        var result = await _dapper.ExecSql<TimeEntries>("DELETE FROM TimeEntries WHERE Id = @id", new {id});
-
-        //        return RedirectToAction("Index", timeEntry.Date);
-        //    }
-
-        //    var model = await GetDayTaskById(id);
-
-        //    return RedirectToAction("Index", model.Date);
-        //}
 
         #endregion
 

@@ -78,8 +78,7 @@
                                     <button type="button" class="btn btn-sm btn-primary js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Edit" onclick="location.href = '@Url.Action("UpdateTimeEntry", "Home", new {id = item.Id})'">
                                         <i class="fa fa-pencil-alt"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Delete"
-                                            onclick="location.href = '@Url.Action("DeleteTimeEntry", "Home", new {id = item.Id})'">
+                                    <button id="deleteBtn" type="button" class="btn btn-sm btn-danger js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Delete" data-id="@item.Id">
                                         <i class="fa fa-times"></i>
                                     </button>
                                 </div>

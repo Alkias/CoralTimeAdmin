@@ -162,9 +162,17 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="DAL\Entities\Client.cs" />
     <Compile Include="DAL\Entities\Project.cs" />
     <Compile Include="DAL\Entities\TaskType.cs" />
+    <Compile Include="Enums\AnimationType.cs" />
+    <Compile Include="Enums\NotyCloseWith.cs" />
+    <Compile Include="Enums\NotyLayout.cs" />
+    <Compile Include="Enums\NotyType.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\IUID.cs" />
+    <Compile Include="Helpers\Noty.cs" />
     <Compile Include="Models\BaseWebEntityModel.cs" />
     <Compile Include="Models\DayOfTask.cs" />
     <Compile Include="Controllers\HomeController.cs" />

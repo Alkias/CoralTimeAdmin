@@ -93,7 +93,7 @@
 
         <!-- Main Container -->
         <main id="main-container">
-           
+
             <!-- Page Content -->
             <div class="content">
                 @RenderBody()
@@ -105,11 +105,79 @@
 
     </div>
 
-
-    @*<script src="~/Content/_js/main/app.js"></script>*@
     <script src="~/Content/js/dashmix.app.min.js"></script>
     <script src="~/Content/js/lib/jquery.min.js"></script>
-    
+    <script src="~/Content/js/plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+
     @RenderSection("scripts", false)
+
+    <script>
+    function applicatioNotieToDashmix(notie) {
+        return {
+            type: notie.type,
+            align: NotieAlign(notie.layout),
+            message: notie.text,
+            icon: NotieIcon(notie.type),
+            from: NotieFrom(notie.layout)
+        }
+    }
+
+    function NotieIcon(str) {
+        switch (str) {
+        case "info":
+            return "fa fa-info-circle mr-1";
+            break;
+        case "success":
+            return "fa fa-check mr-1";
+            break;
+        case "warning":
+            return "fa fa-exclamation mr-1";
+            break;
+        case "danger":
+            return "fa fa-times mr-1";
+            break;
+        default:
+            return "fa fa-info-circle mr-1";
+        }
+    }
+
+    function NotieAlign(str) {
+        switch (str) {
+            case "topLeft":
+                return "left";
+                break;
+            case "topCenter":
+                return "center";
+                break;
+            case "centerLeft":
+                return "center";
+                break;
+            case "centerRight":
+                return "center";
+                break;
+            default:
+                return "center";
+        }
+    }
+
+    function NotieFrom(str) {
+        var from = "top";
+        if (str.startsWith("top"))
+            return from;
+        if (str.startsWith("bottom"))
+            return "bottom";
+    }
+
+   
+
+    jQuery(document).ready(function() {
+
+        var noties = @(TempData["Noties"] != null ? Html.Raw(TempData["Noties"]) : Html.Raw("[]"));
+        for (var i = 0; i < noties.length; i++) {
+            Dashmix.helpers('jq-notify', applicatioNotieToDashmix(noties[i]));
+            //console.log(applicatioNotieToDashmix(noties[i]));
+        }
+    });
+    </script>
 </body>
 </html>

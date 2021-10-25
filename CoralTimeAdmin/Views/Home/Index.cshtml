@@ -15,11 +15,11 @@
                 </p>
             </div>
             <div id="divEmp" class="col-lg-8 space-y-2">
-                @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Mitsos" }, new { @class = "row row-cols-lg-auto g-3 align-items-center" }))
+                @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "TasksData" }, new { @class = "row row-cols-lg-auto g-3 align-items-center" }))
                 {
                     <div class="col-12">
                         @Html.LabelFor(model => model.TaskDay, htmlAttributes: new { @class = "visually-hidden" })
-                        @Html.TextBoxFor(model => model.TaskDay, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" } )
+                        @Html.TextBoxFor(model => model.TaskDay, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })
                     </div>
                     <div>
                         <button type="submit" class="btn btn-primary">Search</button>
@@ -29,18 +29,56 @@
         </div>
     </div>
 </div>
-<div id="Mitsos"></div>
+<div id="TasksData"></div>
 
 
-    @section styles {
-        <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
-        <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
-    }
+@section styles {
+    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
+    <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
+    <link href="~/Content/js/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+}
 
-    @section scripts {
-        <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
-        <script src="~/Scripts/jquery.inputmask.min.js"></script>
-        <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-        <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
-        <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
-    }
+@section scripts {
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/jquery.inputmask.min.js"></script>
+
+    <script src="~/Content/js/plugins/sweetalert2/sweetalert2.min.js"></script>
+
+    <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
+    <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    <script>
+            $(function() {
+                $(document).on("click", "#TasksData #deleteBtn", function() {
+                    var taskId = $(this).attr("data-id");
+
+                    Swal.fire({
+                        title: 'Θέλετε να διαγράψετε αυτό το Task?',
+                        showDenyButton: true,
+                        showCancelButton: false,
+                        confirmButtonText: 'Διαγραφή',
+                        denyButtonText: `Όχι`,
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+
+                            var href = "@Url.Action("DeleteTimeEntry", "Home")" + "/" + taskId;
+
+                            setTimeout(function() {
+                                //your code to be executed after 1 second
+                            }, delayInMilliseconds);
+
+                            window.location.href = href;
+
+                            Swal.fire('Διεγράφει!', '', 'success')
+                        } else if (result.isDenied) {
+                            Swal.fire('Η διαγραφή ακυρώθηκε', '', 'info')
+                        }
+                    })
+
+                    @*var href = "@Url.Action("DeleteTimeEntry", "Home")" + "/" + taskId;
+                    window.location.href = href;*@
+                });
+            })
+    </script>
+}
