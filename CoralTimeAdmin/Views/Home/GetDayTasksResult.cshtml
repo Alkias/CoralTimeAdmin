@@ -2,14 +2,15 @@
 
 @{
     ViewBag.Title = "GetDayTasksResult";
+    var creationDate = Model.Count() > 0 ? Model.FirstOrDefault().Date : ViewBag.CreateDate;
 }
 
 <div class="block block-rounded">
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">Day Task Results</h3>
         <div class="block-options">
-            @*@Html.ActionLink("Create New", "CreateTimeEntry", "", htmlAttributes: new { @class = "btn btn-sm btn-primary" })*@
-            <a href="@Url.Action("CreateTimeEntry","Home")" class="btn btn-sm btn-primary">Create New</a>
+            @*<a href="@Url.Action("CreateTimeEntry","Home", new{date = Model.FirstOrDefault().Date})" class="btn btn-sm btn-primary">Create New</a>*@
+            <a href="@Url.Action("CreateTimeEntry","Home", new{date = creationDate})" class="btn btn-sm btn-primary">Create New</a>
         </div>
     </div>
     <div class="block-content">

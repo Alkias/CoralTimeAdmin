@@ -7,7 +7,7 @@
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
             <a href="@Url.Action("Index", new{date=Model.Date})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
-            <a href="@Url.Action("CreateTimeEntry")" class="btn btn-sm btn-success me-1"><i class="fa fa-fw fa-plus me-1"></i> Create New</a>
+            <a href="@Url.Action("CreateTimeEntry","Home", new{date = Model.Date})"class="btn btn-sm btn-success me-1"><i class="fa fa-fw fa-plus me-1"></i> Create New</a>
         </div>
     </div>
     <div class="block-content">
@@ -40,6 +40,10 @@
                     <div class="mb-4">
                         @Html.LabelFor(model => model.Project, htmlAttributes: new {@class = "form-label"})
                         @Html.EditorFor(model => model.Project, new {htmlAttributes = new {@class = "form-control"}})
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(model => model.Description, htmlAttributes: new {@class = "form-label"})
+                        @Html.TextAreaFor(model => model.Description,new {@class = "form-control",rows="4"})
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(model => model.Task, htmlAttributes: new {@class = "form-label"})

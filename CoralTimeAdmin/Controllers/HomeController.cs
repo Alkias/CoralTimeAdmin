@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -40,8 +41,16 @@ namespace CoralTimeAdmin.Controllers
             return View(model);
         }
 
-        public async Task<ActionResult> CreateTimeEntry() {
+        public async Task<ActionResult> CreateTimeEntry(DateTime date) {
             var model = new TimeEntriesModel();
+
+            var cultureInfo = new CultureInfo("el-GR");
+            var eventDate = DateTime.ParseExact(
+                date.ToString(),
+                "dd/MM/yyyy hh:mm:ss",
+                cultureInfo);
+
+            model.Date = eventDate;
 
             await PrepareTimeEntryModelSelectionLists(model);
 
@@ -51,7 +60,9 @@ namespace CoralTimeAdmin.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateTimeEntry (TimeEntriesModel model) {
+        public async Task<ActionResult> CreateTimeEntry (TimeEntriesModel model) {
+            //https://stackoverflow.com/questions/35950402/how-to-insert-datetime2
+            //https://stackoverflow.com/questions/11231614/how-can-i-get-dapper-to-map-net-datetime-to-datetime2
             DateTime _timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
             DateTime _timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
 
@@ -59,19 +70,86 @@ namespace CoralTimeAdmin.Controllers
             model.TimeTo = (int) (_timeTo - model.Date.Date).TotalSeconds;
             model.TimeActual = model.TimeTo - model.TimeFrom;
 
+            var rnd = new Random();
+            var h = (int) (_timeFrom - model.Date.Date).TotalHours;
+            var m = (int) (_timeFrom - model.Date.Date).TotalMinutes;
+            var s = (int) (_timeFrom - model.Date.Date).TotalSeconds;
+            var ms = rnd.Next(1000000, 9999999);
+
+            //var tempDate = new DateTime(model.Date.Year, model.Date.Month, model.Date.Day, h, m, s).AddTicks(ms);
+            var tempDate = model.Date.Date;
+            tempDate.AddHours(h);
+            tempDate.AddMinutes(m);
+            tempDate.AddSeconds(s);
+            tempDate.AddTicks(ms);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@creationDate", tempDate, DbType.DateTime2, ParameterDirection.Input, 7);
+            parameters.Add("@creatorId", model.CreatorId, DbType.String);
+            parameters.Add("@date", model.Date.Date,DbType.DateTime2);
+            parameters.Add("@description", model.Description, DbType.String);
+            parameters.Add("@isFromToShow", model.IsFromToShow, DbType.Boolean);
+            parameters.Add("@lastEditorUserId", model.LastEditorUserId, DbType.String);
+            parameters.Add("@lastUpdateDate", tempDate, DbType.DateTime2, ParameterDirection.Input, 7);
+            parameters.Add("@memberId", model.MemberId, DbType.Int32);
+            parameters.Add("@timeEstimated", model.TimeEstimated, DbType.Int32);
+            parameters.Add("@projectId", model.ProjectId, DbType.Int32);
+            parameters.Add("@taskTypesId", model.TaskTypesId, DbType.Int32);
+            parameters.Add("@timeActual", model.TimeActual, DbType.Int32);
+            parameters.Add("@timeFrom", model.TimeFrom, DbType.Int32);
+            parameters.Add("@timeTimerStart", model.TimeTimerStart, DbType.Int32);
+            parameters.Add("@timeTo", model.TimeTo, DbType.Int32);
+            parameters.Add("@new_identity", null, DbType.Int32, ParameterDirection.Output);
+
+
+
+            /*
+            var parameters = new DynamicParameters(
+                new
+                {
+                    creationDate = tempDate,
+                    creatorId = model.CreatorId,
+                    date = model.Date.Date,
+                    description = model.Description,
+                    isFromToShow = model.IsFromToShow,
+                    lastEditorUserId = model.LastEditorUserId,
+                    lastUpdateDate = tempDate,
+                    memberId = model.MemberId,
+                    timeEstimated = model.TimeEstimated,
+                    projectId = model.ProjectId,
+                    taskTypesId = model.TaskTypesId,
+                    timeActual = model.TimeActual,
+                    timeFrom = model.TimeFrom,
+                    timeTimerStart = model.TimeTimerStart,
+                    timeTo = model.TimeTo
+                });
+                parameters.Add("@DateTimeParam", dateTimeValue, DbType.DateTime2);
+                */
+
+
+            var result = await _dapper.ExecProc<TimeEntries>("InsetTimeEntry", parameters);
+            var newId = parameters.Get<string>("@new_identity");
+
+
+            return RedirectToAction("UpdateTimeEntry", new {id = newId });
+
+            //var timeEntries = InsertTimeEntry(model, _timeTo, _timeFrom);
+
+            //return RedirectToAction("UpdateTimeEntry", new {id = timeEntries.Id});
+        }
+
+        private TimeEntries InsertTimeEntry (TimeEntriesModel model, DateTime timeTo, DateTime timeFrom) {
             model.Date = model.Date.Date;
-            model.LastUpdateDate = _timeTo;
-            model.CreationDate = _timeFrom;
+            model.LastUpdateDate = timeTo;
+            model.CreationDate = timeFrom;
 
             TimeEntries timeEntries = new TimeEntries();
             ModelToEntity(model, timeEntries);
 
             _repository.Insert(timeEntries);
-
-            return RedirectToAction("UpdateTimeEntry", new {id = timeEntries.Id});
+            return timeEntries;
         }
 
-        
         public ActionResult DeleteTimeEntry(int id) {
 
             var timeEntries = _repository.GetById(id);
@@ -88,6 +166,8 @@ namespace CoralTimeAdmin.Controllers
             var aDate = model.TaskDay;
             var newSqlParames = new DynamicParameters(new {date = aDate.ToString("yyyy-MM-dd")});
             var result = await _dapper.ExecProc<DayTasks>("GetEntriesForDay", newSqlParames);
+
+            ViewBag.CreateDate = aDate;
 
             return PartialView(result);
         }
@@ -119,7 +199,8 @@ namespace CoralTimeAdmin.Controllers
                 new {
                     timeEntryId = model.Id,
                     fromTime = $"{model.FromTime}:{rnd.Next(10, 59)}",
-                    toTime = $"{model.ToTime}:{rnd.Next(10, 59)}"
+                    toTime = $"{model.ToTime}:{rnd.Next(10, 59)}",
+                    description = model.Description
                 });
             var result = await _dapper.ExecProc<DayTasks>("UpdateTimeEntry", parameters);
 
@@ -276,9 +357,9 @@ namespace CoralTimeAdmin.Controllers
         private void PrepareTimeEntryModel (TimeEntriesModel model) {
             model.CreatorId = _creatorId;
             model.LastEditorUserId = _creatorId;
-            model.Date = DateTime.Now;
-            model.CreationDate = DateTime.Now;
-            model.LastUpdateDate = DateTime.Now;
+            model.Date = model.Date;// DateTime.Now;
+            model.CreationDate = model.Date;
+            model.LastUpdateDate = model.Date;
             model.TimeTimerStart = -1;
             model.TimeEstimated = 0;
             model.MemberId = 1;
