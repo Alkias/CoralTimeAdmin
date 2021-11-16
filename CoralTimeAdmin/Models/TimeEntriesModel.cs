@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
 
 namespace CoralTimeAdmin.Models
 {
-    public class TimeEntriesModel : BaseWebEntityModel
+    public class TimeEntriesModel : ViewModelBase
     {
-        public TimeEntriesModel() {
-            AvailableProjects = new List<SelectListItem>();
-            AvailableTasks = new List<SelectListItem>();
-        }
         public DateTime CreationDate { get; set; }
 
         public string CreatorId { get; set; }
@@ -45,10 +39,8 @@ namespace CoralTimeAdmin.Models
 
         [Display(Name = "From Time", AutoGenerateFilter = false)]
         public string TimeFromStr { get; set; }
+
         [Display(Name = "To Time", AutoGenerateFilter = false)]
         public string TimeToStr { get; set; }
-
-        public IList<SelectListItem> AvailableProjects { get; set; }
-        public IList<SelectListItem> AvailableTasks { get; set; }
     }
 }

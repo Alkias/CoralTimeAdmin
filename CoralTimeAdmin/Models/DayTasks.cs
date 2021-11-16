@@ -2,10 +2,12 @@
 
 namespace CoralTimeAdmin.Models
 {
-    public class DayTasks
+    public class DayTasks : ViewModelBase
     {
         public int Id { get; set; }
         public string Project { get; set; }
+        public int ProjectId { get; set; }
+        public int TaskTypesId { get; set; }
         public string Task { get; set; }
         public string TaskDescription { get; set; }
         public string Date { get; set; }
@@ -20,9 +22,7 @@ namespace CoralTimeAdmin.Models
         public string TimeStart { get; set; }
         public string Duration { get; set; }
 
-        [NotMapped]
-        public string EventStart { get; set; }
-        [NotMapped]
-        public string EventEnd { get; set; }
+        [NotMapped] public string EventStart { get; set; }
+        [NotMapped] public string EventEnd { get; set; }
     }
 }

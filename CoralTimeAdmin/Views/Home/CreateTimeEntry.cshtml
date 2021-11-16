@@ -7,7 +7,6 @@
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
-            @*<a href="@Url.Action("Index", new{date=Model.Date.ToString("dd/MM/yyyy")})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>*@
             <a href="@Url.Action("Index", new{date=Model.Date})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
         </div>
     </div>
@@ -42,10 +41,6 @@
                         @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
                         <div class="col-sm-8">
                             <input type="text" class="js-datepicker form-control" data_date_format="dd/mm/yyyy" name="Date" id="Date" value="@Model.Date.ToString("MM/dd/yyyy")" />
-                            @*@Html.TextBoxFor(model => model.Date, new {@class = "js-datepicker form-control", @value = Model.Date.ToString("dd/MM/yyyy"), data_date_format = "dd/mm/yyyy"})*@
-                            @*@Html.TextBoxFor(model => model.Date, "{0:MM/dd/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })*@
-                            @*@Html.TextBoxFor(model => model.Date, "{0:MM/dd/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })*@
-                            @*@Html.TextBoxFor(model => model.Date, new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })*@
                         </div>
                     </div>
                     <div class="row mb-4">
