@@ -1,7 +1,23 @@
 USE [CoralTime]
 GO
 
-/****** Object:  StoredProcedure [dbo].[GetEntriesForDay]    Script Date: 16/11/2021 11:03:49 ******/
+/****** Object:  StoredProcedure [dbo].[UpdateTimeEntry]    Script Date: 26/11/2021 17:27:13 ******/
+DROP PROCEDURE [dbo].[UpdateTimeEntry]
+GO
+
+/****** Object:  StoredProcedure [dbo].[InsetTimeEntry]    Script Date: 26/11/2021 17:27:13 ******/
+DROP PROCEDURE [dbo].[InsetTimeEntry]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetEntryById]    Script Date: 26/11/2021 17:27:13 ******/
+DROP PROCEDURE [dbo].[GetEntryById]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetEntriesForDay]    Script Date: 26/11/2021 17:27:13 ******/
+DROP PROCEDURE [dbo].[GetEntriesForDay]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetEntriesForDay]    Script Date: 26/11/2021 17:27:13 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -46,7 +62,7 @@ BEGIN
 END
 GO
 
-/****** Object:  StoredProcedure [dbo].[GetEntryById]    Script Date: 16/11/2021 11:03:49 ******/
+/****** Object:  StoredProcedure [dbo].[GetEntryById]    Script Date: 26/11/2021 17:27:13 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -94,7 +110,7 @@ exec GetEntryById 235
 */
 GO
 
-/****** Object:  StoredProcedure [dbo].[InsetTimeEntry]    Script Date: 16/11/2021 11:03:49 ******/
+/****** Object:  StoredProcedure [dbo].[InsetTimeEntry]    Script Date: 26/11/2021 17:27:13 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -164,7 +180,7 @@ BEGIN
 END
 GO
 
-/****** Object:  StoredProcedure [dbo].[UpdateTimeEntry]    Script Date: 16/11/2021 11:03:49 ******/
+/****** Object:  StoredProcedure [dbo].[UpdateTimeEntry]    Script Date: 26/11/2021 17:27:13 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -176,7 +192,11 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE [dbo].[UpdateTimeEntry] @timeEntryId INT,
+CREATE PROCEDURE [dbo].[UpdateTimeEntry] 
+	@timeEntryId INT,
+	@creationDate datetime2(7),
+	@date datetime2(7),
+	@lastUpdateDate datetime2(7),
 	@fromTime NVARCHAR(255),
 	@toTime NVARCHAR(255),
 	@description NVARCHAR(1000),
@@ -208,7 +228,10 @@ BEGIN
 		TimeActual = @act,
 		[Description] = @description,
 		ProjectId = @projectId,
-		TaskTypesId = @taskTypesId
+		TaskTypesId = @taskTypesId,
+		[CreationDate] = @creationDate,
+		[Date] = @date,
+		[LastUpdateDate] = @lastUpdateDate
 	WHERE id = @timeEntryId
 END
 

@@ -149,16 +149,16 @@
             $(document).on("click", "#event-start", function ()
             {
                 
-                $("#FromTime").val($(this).find("#event-start-val").text());
+                $("#TimeFromStr").val($(this).find("#event-start-val").text());
                 var data = $("#event-start-val").text();
-                $("#FromTime").flatpickr("set", "enable", data);
+                $("#TimeFromStr").flatpickr("set", "enable", data);
             });
 
             $(document).on("click", "#event-end", function ()
             {
-                $("#ToTime").val($(this).find("#event-end-val").text());
+                $("#TimeToStr").val($(this).find("#event-end-val").text());
                 var data = $("#event-end-val").text();
-                $("#ToTime").flatpickr("set", "enable", data);
+                $("#TimeToStr").flatpickr("set", "enable", data);
             });
         })
     </script>
