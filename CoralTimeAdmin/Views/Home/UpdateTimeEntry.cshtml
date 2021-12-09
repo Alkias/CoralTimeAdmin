@@ -1,12 +1,22 @@
-﻿@model DayTasks
+﻿@using System.Globalization
+@model DayTasks
 @{
     ViewBag.Title = "Update Time Entry";
+
+
+    var cultureProvider = new CultureInfo("el-GR");
+    string creationDateStr = null;
+    creationDateStr = Model.Date.Replace(" 00:00:00", "");
+    var format = "MM/dd/yyyy";
+    DateTime creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
+    var backDate = creationDate.ToString("dd/MM/yyyy");
+
 }
 <div class="block block-rounded">
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
-            <a href="@Url.Action("Index", new{date=Model.Date})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
+            <a href="@Url.Action("Index", new{date=backDate})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
             <a href="@Url.Action("CreateTimeEntry","Home", new{date = Model.Date})"class="btn btn-sm btn-success me-1"><i class="fa fa-fw fa-plus me-1"></i> Create New</a>
         </div>
     </div>
@@ -64,12 +74,12 @@
                             @Html.TextAreaFor(model => model.Description, new {@class = "form-control", rows = "4"})
                         </div>
                     </div>
-                    <div class="row mb-4">
+                    @*<div class="row mb-4">
                         @Html.LabelFor(model => model.Task, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">
                             @Html.EditorFor(model => model.Task, new {htmlAttributes = new {@class = "form-control"}})
                         </div>
-                    </div>
+                    </div>*@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.FromTime, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">

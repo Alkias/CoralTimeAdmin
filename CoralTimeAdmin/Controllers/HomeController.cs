@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using CoralTimeAdmin.DAL.Entities;
@@ -59,10 +60,34 @@ namespace CoralTimeAdmin.Controllers
             return View(model);
         }
 
+
+        /// <summary>
+        /// Create a datetime 2(7) from a Datetime and startTime
+        /// </summary>
+        /// <param name="date">Base Datetime</param>
+        /// <param name="timeFrom">Base StartTime</param>
+        /// <returns></returns>
+        private static DateTime ConvertEntryDatesFromStartTime(DateTime date, DateTime timeFrom)
+        {
+            var tempDate = date.Date;
+            var rnd = new Random();
+            var h = (int)(timeFrom - date.Date).TotalHours;
+            var m = (int)(timeFrom - date.Date).TotalMinutes;
+            var s = (int)(timeFrom - date.Date).TotalSeconds;
+            var ms = rnd.Next(1000000, 9999999);
+
+            tempDate.AddHours(h);
+            tempDate.AddMinutes(m);
+            tempDate.AddSeconds(s);
+            tempDate.AddTicks(ms);
+
+            return tempDate;
+        }
         [HttpPost]
         public async Task<ActionResult> CreateTimeEntry (TimeEntriesModel model) {
             //https://stackoverflow.com/questions/35950402/how-to-insert-datetime2
             //https://stackoverflow.com/questions/11231614/how-can-i-get-dapper-to-map-net-datetime-to-datetime2
+
             DateTime _timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
             DateTime _timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
 
@@ -96,29 +121,6 @@ namespace CoralTimeAdmin.Controllers
             return RedirectToAction("UpdateTimeEntry", new {id = newId});
         }
 
-
-        private TimeEntries InsertTimeEntry (TimeEntriesModel model, DateTime timeTo, DateTime timeFrom) {
-            model.Date = model.Date.Date;
-            model.LastUpdateDate = timeTo;
-            model.CreationDate = timeFrom;
-
-            TimeEntries timeEntries = new TimeEntries();
-            ModelToEntity(model, timeEntries);
-
-            _repository.Insert(timeEntries);
-            return timeEntries;
-        }
-
-        public ActionResult DeleteTimeEntry (int id) {
-            var timeEntries = _repository.GetById(id);
-
-            _repository.Delete(timeEntries);
-
-            Success("Time Entry Deleted Successfully");
-
-            return RedirectToAction("Index", new {date = timeEntries.Date});
-        }
-
         [HttpPost]
         public async Task<ActionResult> GetDayTasksResult (DayOfTask model) {
             var aDate = model.TaskDay;
@@ -137,6 +139,13 @@ namespace CoralTimeAdmin.Controllers
                 dayTask.FromTime = dayTask.FromTime.Replace(":000", "");
                 dayTask.ToTime = dayTask.ToTime.Replace(":000", "");
 
+                var cultureProvider = new CultureInfo("el-GR");
+                string creationDateStr = null;
+                creationDateStr = dayTask.Date.Replace(" 00:00:00", "");
+                var format = "MM/dd/yyyy";
+                DateTime creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
+                dayTask.Date = creationDate.ToString("dd/MM/yyyy");
+
                 await PrepareTimeEntryModelSelectionLists(dayTask);
 
                 return View(dayTask);
@@ -149,57 +158,60 @@ namespace CoralTimeAdmin.Controllers
         public async Task<ActionResult> UpdateTimeEntry (DayTasks model) {
             var rnd = new Random();
 
-            //  @timeEntryId INT,
-            //  @creationDate datetime2(7),
-            //  @date datetime2(7),
-            //  @lastUpdateDate datetime2(7),
-            //  @fromTime NVARCHAR(255),
-            //  @toTime NVARCHAR(255),
-            //  @description NVARCHAR(1000),
-            //  @projectId INT,
-            //  @taskTypesId INT
+            string creationDateStr = null, lastUpdateDateStr = null;
+            DateTime creationDate, lastUpdateDate;
+            var cultureProvider = new CultureInfo("el-GR");
+            var format = "dd/MM/yyyy HH:mm:ss.fffffff";
+            try {
+                creationDateStr = model.Date.Replace(" 00:00:00", "") + " " + model.FromTime + "." + rnd.Next(1000000, 9999999);
+                lastUpdateDateStr = model.Date.Replace(" 00:00:00", "") + " " + model.ToTime + "." + rnd.Next(1000000, 9999999);
 
-            DateTime dt = DateTime.ParseExact(model.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            DateTime fd =dt + TimeSpan.Parse(model.FromTime);
+                creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
+                lastUpdateDate = DateTime.ParseExact(lastUpdateDateStr, format, cultureProvider);
 
-            var tempDate = ConvertEntryDatesFromStartTime(dt, fd);
+                var parameters = new DynamicParameters();
+                parameters.Add("@timeEntryId", model.Id, DbType.Int32);
+                parameters.Add("@creationDate", creationDate, DbType.DateTime2, ParameterDirection.Input, 7); // datetime2(7),
+                parameters.Add("@date", model.Date, DbType.DateTime2, ParameterDirection.Input, 7); // datetime2(7),
+                parameters.Add("@lastUpdateDate", lastUpdateDate, DbType.DateTime2, ParameterDirection.Input, 7); // datetime2(7),
+                parameters.Add("@fromTime", $"{model.FromTime}:{rnd.Next(10, 59)}", DbType.String); // NVARCHAR(255),
+                parameters.Add("@toTime", $"{model.ToTime}:{rnd.Next(10, 59)}", DbType.String); // NVARCHAR(255),
+                parameters.Add("@description", model.Description, DbType.String); // NVARCHAR(1000),
+                parameters.Add("@projectId", model.ProjectId, DbType.Int32); // INT,
+                parameters.Add("@taskTypesId", model.TaskTypesId, DbType.Int32); // INT
 
-            var parameters = new DynamicParameters();
-            parameters.Add("@timeEntryId", model.Id, DbType.Int32);
-            parameters.Add("@creationDate", model.Date, DbType.DateTime2, ParameterDirection.Input, 7);// datetime2(7),
-            parameters.Add("@date", model.Date, DbType.DateTime2, ParameterDirection.Input, 7);// datetime2(7),
-            parameters.Add("@lastUpdateDate", model.Date, DbType.DateTime2, ParameterDirection.Input, 7);// datetime2(7),
-            parameters.Add("@fromTime", $"{model.FromTime}:{rnd.Next(10, 59)}", DbType.String);// NVARCHAR(255),
-            parameters.Add("@toTime", $"{model.ToTime}:{rnd.Next(10, 59)}", DbType.String);// NVARCHAR(255),
-            parameters.Add("@description", model.Description, DbType.String);// NVARCHAR(1000),
-            parameters.Add("@projectId", model.ProjectId, DbType.Int32);// INT,
-            parameters.Add("@taskTypesId", model.TaskTypesId, DbType.Int32);// INT
+                var result = await _dapper.ExecProc<DayTasks>("UpdateTimeEntry", parameters);
 
-            //var parameters = new DynamicParameters(
-            //    new {
-            //        timeEntryId = model.Id,
-            //        creationDate = model.Date
-            //        fromTime = $"{model.FromTime}:{rnd.Next(10, 59)}",
-            //        toTime = $"{model.ToTime}:{rnd.Next(10, 59)}",
-            //        description = model.Description,
-            //        projectId = model.ProjectId,
-            //        taskTypesId = model.TaskTypesId
-            //    });
-            var result = await _dapper.ExecProc<DayTasks>("UpdateTimeEntry", parameters);
-
-            Success("Time Entry Updated Successfully");
+                Success("Time Entry Updated Successfully");
+            }
+            catch (FormatException) {
+                Console.WriteLine("{0} is not in the correct format.", creationDateStr);
+            }
 
             return RedirectToAction("UpdateTimeEntry", new {id = model.Id});
         }
 
+        public ActionResult DeleteTimeEntry (int id) {
+            var timeEntries = _repository.GetById(id);
+
+            _repository.Delete(timeEntries);
+
+            Success("Time Entry Deleted Successfully");
+
+            return RedirectToAction("Index", new {date = timeEntries.Date});
+        }
+
         [HttpPost]
         public ActionResult GetSystemEvents (string daytime) {
-            var cultureInfo = new CultureInfo("el-GR");
+            // ignore trailing time
+            string pattern = @"\s+.*";
+            daytime = Regex.Replace(daytime, pattern, "");
+
             var eventDate = DateTime.ParseExact(
                 daytime,
-                "MM/dd/yyyy hh:mm:ss",
+                "dd/MM/yyyy",
                 CultureInfo.InvariantCulture);
-
+            
             string eventLogName = "System";
             string sourceName = "EventLoggingApp";
             string machineName = "INTELLI15-PC";
@@ -234,29 +246,6 @@ namespace CoralTimeAdmin.Controllers
         #region Privates
 
 
-        /// <summary>
-        /// Create a datetime 2(7) from a Datetime and startTime
-        /// </summary>
-        /// <param name="date">Base Datetime</param>
-        /// <param name="timeFrom">Base StartTime</param>
-        /// <returns></returns>
-        private static DateTime ConvertEntryDatesFromStartTime(DateTime date, DateTime timeFrom)
-        {
-            var tempDate = date.Date;
-            var rnd = new Random();
-            var h = (int)(timeFrom - date.Date).TotalHours;
-            var m = (int)(timeFrom - date.Date).TotalMinutes;
-            var s = (int)(timeFrom - date.Date).TotalSeconds;
-            var ms = rnd.Next(1000000, 9999999);
-
-            tempDate.AddHours(h);
-            tempDate.AddMinutes(m);
-            tempDate.AddSeconds(s);
-            tempDate.AddTicks(ms);
-
-            return tempDate;
-        }
-
         private void EntityToModel (TimeEntries entity, TimeEntriesModel model) {
             model.CreationDate = entity.CreationDate;
             model.CreatorId = entity.CreatorId;
@@ -287,43 +276,6 @@ namespace CoralTimeAdmin.Controllers
             var execResult = await _dapper.ExecSql<Project>("SELECT * FROM Projects WHERE IsActive=1 Order by Name");
 
             return execResult.ToList();
-        }
-
-        private SystemEvents GetSystemEvents_DD (DayTasks timeEntry) {
-            var cultureInfo = new CultureInfo("el-GR");
-
-            //10/11/2021 00:00:00
-            var eventDate = DateTime.ParseExact(
-                timeEntry.Date,
-                "MM/dd/yyyy hh:mm:ss",
-                CultureInfo.InvariantCulture);
-
-            string eventLogName = "System";
-            string sourceName = "EventLoggingApp";
-            string machineName = "INTELLI15-PC";
-
-            EventLog eventLog = new EventLog();
-            eventLog.Log = eventLogName;
-            eventLog.Source = sourceName;
-            eventLog.MachineName = machineName;
-
-            var allLogs = eventLog.Entries;
-
-            var mitsos = allLogs.Cast<EventLogEntry>()
-                .Where(x => x.TimeGenerated.Date == eventDate.Date)
-                .Select(
-                    x => new {
-                        x.MachineName,
-                        x.Site,
-                        x.Source,
-                        x.Message,
-                        x.TimeGenerated,
-                    }).ToList();
-
-            return new SystemEvents {
-                EventStart = mitsos.First().TimeGenerated.ToString("hh:mm:ss"),
-                EventEnd = mitsos.Last().TimeGenerated.ToString("hh:mm:ss")
-            };
         }
 
         private async Task<List<TaskType>> GetTaskTypes() {
