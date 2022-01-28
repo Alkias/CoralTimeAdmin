@@ -207,6 +207,26 @@ namespace CoralTimeAdmin.Helpers
 
         #endregion Strings
 
+        /// <summary>
+        /// Convert a date string to DateTime.
+        /// </summary>
+        /// <param name="dateString">Date String (i.e. 25/03/2003)</param>
+        /// <param name="format">Optional: Date Format, Default: "dd/MM/yyyy"</param>
+        /// <returns></returns>
+        public static DateTime ToDate (this string dateString, string format = "dd/MM/yyyy") {
+            var creationDateStr = dateString.Replace(" 00:00:00", "");
+
+            try {
+                DateTime creationDate = DateTime.ParseExact(creationDateStr, format, CultureInfo.InvariantCulture);
+                return creationDate;
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        
+
         #region Nulls
 
         /// <summary>

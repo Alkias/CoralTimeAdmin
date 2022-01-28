@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CoralTimeAdmin.Models
 {
@@ -10,7 +11,7 @@ namespace CoralTimeAdmin.Models
         public int TaskTypesId { get; set; }
         public string Task { get; set; }
         public string TaskDescription { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public string LastUpdateDate { get; set; }
         public string Description { get; set; }
         public int TimeActual { get; set; }
@@ -24,5 +25,9 @@ namespace CoralTimeAdmin.Models
 
         [NotMapped] public string EventStart { get; set; }
         [NotMapped] public string EventEnd { get; set; }
+
+        public DayTasks PreviewsTask { get; set; }
+
+        public DayTasks NextTask { get; set; }
     }
 }

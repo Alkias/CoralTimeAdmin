@@ -1,23 +1,14 @@
-﻿@using System.Globalization
-@model DayTasks
+﻿@model DayTasks
 @{
     ViewBag.Title = "Update Time Entry";
-
-
-    var cultureProvider = new CultureInfo("el-GR");
-    string creationDateStr = null;
-    creationDateStr = Model.Date.Replace(" 00:00:00", "");
-    var format = "MM/dd/yyyy";
-    DateTime creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
-    var backDate = creationDate.ToString("dd/MM/yyyy");
 
 }
 <div class="block block-rounded">
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
-            <a href="@Url.Action("Index", new{date=backDate})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
-            <a href="@Url.Action("CreateTimeEntry","Home", new{date = Model.Date})"class="btn btn-sm btn-success me-1"><i class="fa fa-fw fa-plus me-1"></i> Create New</a>
+            <a href="@Url.Action("Index", new{dateString=Model.Date.ToString("d")})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
+            <a href="@Url.Action("CreateTimeEntry","Home", new{date = Model.Date})" class="btn btn-sm btn-success me-1"><i class="fa fa-fw fa-plus me-1"></i> Create New</a>
         </div>
     </div>
     <div class="block-content">
@@ -26,13 +17,26 @@
                 <p class="text-muted">
                     An often used layout which is very easy to create with minimal markup
                 </p>
+
                 <div class="row items-push text-center text-sm-start mb-12">
                     <div class="col-sm-12 col-xl-12">
                         <button id="get-events" class="btn btn-sm btn-alt-primary">Get Events</button>
                     </div>
                     <div class="col-sm-12 col-xl-12">
-                        <a id="event-start" class="btn btn-sm btn-alt-primary push" href="javascript:void(0)">Start: <span id="event-start-val"></span></a> 
-                        <a id="event-end" class="btn btn-sm btn-alt-primary push" href="javascript:void(0)">End: <span id="event-end-val"></span></a>
+                        <a id="event-start" class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span></span></a>
+                        <a id="event-end" class="btn btn-sm btn-alt-primary push event-end" href="javascript:void(0)">End: <span id="event-end-val"></span></a>
+                    </div>
+                </div>
+
+                <div class="row items-push text-center text-sm-start mb-12">
+                    <div class="col-sm-12 col-xl-12">
+                        @Model.PreviewsTask.Project,
+                        @Model.PreviewsTask.Task,
+                        @Model.PreviewsTask.Description
+                    </div>
+                    <div class="col-sm-12 col-xl-12">
+                        <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.FromTime.Replace(":000", "")</span></a>
+                        <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.ToTime.Replace(":000", "")</span></a>
                     </div>
                 </div>
             </div>
@@ -43,13 +47,13 @@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Id, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">
-                             @Html.EditorFor(model => model.Id, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.EditorFor(model => model.Id, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
                     </div>
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">
-                             @Html.TextBoxFor(model => model.Date, "{0:dd/MM/yyyy}", new {@class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy"})
+                            @Html.TextBoxFor(model => model.Date, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })
                         </div>
                     </div>
 
@@ -71,15 +75,9 @@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">
-                            @Html.TextAreaFor(model => model.Description, new {@class = "form-control", rows = "4"})
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "4" })
                         </div>
                     </div>
-                    @*<div class="row mb-4">
-                        @Html.LabelFor(model => model.Task, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
-                        <div class="col-sm-9">
-                            @Html.EditorFor(model => model.Task, new {htmlAttributes = new {@class = "form-control"}})
-                        </div>
-                    </div>*@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.FromTime, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">
@@ -117,14 +115,17 @@
 @section styles {
     <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
     <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
+
 }
 @section scripts {
     <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
     <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    <script src="~/Content/js/jquery.eventlogs.js"></script>
     <script>
         $(function () {
-            $("#event-start").hide();
+
+            @*$("#event-start").hide();
             $("#event-end").hide();;
             $(document).on("click", "#get-events", function () {
 
@@ -137,29 +138,29 @@
                 $.ajax({
                     method : "POST",
                     url : "@Url.Action("GetSystemEvents", "Home")",
-                    data: { daytime : "@Model.Date" }
+                    data: { date : "@Model.Date.ToString("d")" }
                 }).done(function (msg) {
                         Dashmix.layout('header_loader_off');
 
                     if (msg.EventStart && msg.EventStart != "") {
-                       
+
                         $("#event-start").show();
                         $("#event-start-val").text(msg.EventStart).show();
-                       
+
                     }
-                            
+
                     if (msg.EventEnd && msg.EventEnd != "") {
-                        
+
                         $("#event-end").show();
                         $("#event-end-val").text(msg.EventEnd).show();
                     }
-                           
+
                 });
             });
 
             $(document).on("click", "#event-start", function ()
             {
-                
+
                 $("#FromTime").val($(this).find("#event-start-val").text());
                 var data = $("#event-start-val").text();
                 $("#FromTime").flatpickr("set", "enable", data);
@@ -170,7 +171,13 @@
                 $("#ToTime").val($(this).find("#event-end-val").text());
                 var data = $("#event-end-val").text();
                 $("#ToTime").flatpickr("set", "enable", data);
+            });*@
+
+            var evLogs = new EventLogs({
+                url : "@Url.Action("GetSystemEvents", "Home")",
+                date : "@Model.Date.ToString("d")"
             });
+
         })
     </script>
 }

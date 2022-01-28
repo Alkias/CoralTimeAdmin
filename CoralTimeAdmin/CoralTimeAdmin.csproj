@@ -201,6 +201,7 @@
   <ItemGroup>
     <Content Include="Content\js\dashmix.app.min.js" />
     <Content Include="Content\js\dashmix.app.min.txt" />
+    <Content Include="Content\js\jquery.eventlogs.js" />
     <Content Include="Content\js\lib\jquery.min.js" />
     <Content Include="Content\js\pages\be_comp_calendar.min.js" />
     <Content Include="Content\js\pages\be_comp_charts.min.js" />

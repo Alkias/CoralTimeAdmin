@@ -1,4 +1,4 @@
-﻿@model DayOfTask
+﻿@model DateTime
 
 @{
     ViewBag.Title = "GetDayTasks";
@@ -18,8 +18,7 @@
                 @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "TasksData" }, new { @class = "row row-cols-lg-auto g-3 align-items-center", id="form-index" }))
                 {
                     <div class="col-12">
-                        @Html.LabelFor(model => model.TaskDay, htmlAttributes: new { @class = "visually-hidden" })
-                        @Html.TextBoxFor(model => model.TaskDay, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })
+                        @Html.TextBoxFor(model => model.Date, "{0:d}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })
                     </div>
                     <div>
                         <button type="submit" class="btn btn-primary">Search</button>
@@ -69,7 +68,7 @@
 
                             setTimeout(function() {
                                 //your code to be executed after 1 second
-                            }, delayInMilliseconds);
+                            }, 5000);
 
                             window.location.href = href;
 

@@ -9,8 +9,7 @@
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">Day Task Results</h3>
         <div class="block-options">
-            @*<a href="@Url.Action("CreateTimeEntry","Home", new{date = Model.FirstOrDefault().Date})" class="btn btn-sm btn-primary">Create New</a>*@
-            <a href="@Url.Action("CreateTimeEntry","Home", new{date = creationDate})" class="btn btn-sm btn-primary">Create New</a>
+            <a href="@Url.Action("CreateTimeEntry", "Home", new {date = creationDate})" class="btn btn-sm btn-primary">Create New</a>
         </div>
     </div>
     <div class="block-content">

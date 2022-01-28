@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using CoralTimeAdmin.DAL.Entities;
 
 namespace CoralTimeAdmin.Models
 {
@@ -42,5 +43,9 @@ namespace CoralTimeAdmin.Models
 
         [Display(Name = "To Time", AutoGenerateFilter = false)]
         public string TimeToStr { get; set; }
+
+        public DayTasks PreviewsTask { get; set; }
+
+        public DayTasks NextTask { get; set; }
     }
 }
