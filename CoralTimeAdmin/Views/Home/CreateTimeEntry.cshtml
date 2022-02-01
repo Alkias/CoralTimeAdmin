@@ -52,7 +52,7 @@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
                         <div class="col-sm-8">
-                            <input type="text" class="js-datepicker form-control" data_date_format="dd/MM/yyyy" name="Date" id="Date" value="@Model.Date.ToString("d")" />
+                            <input type="text" class="js-datepicker form-control" data-date-format="dd/MM/yyyy" name="Date" id="Date" value="@Model.Date.ToString("d")" />
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -115,14 +115,12 @@
 </div>
 
 @section styles {
-    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
     <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
 }
 
 @section scripts {
-    <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
-    <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    <script>Dashmix.helpersOnLoad(['js-flatpickr']);</script>
     <script src="~/Content/js/jquery.eventlogs.js"></script>
 
     <script>

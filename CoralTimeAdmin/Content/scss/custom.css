@@ -1,0 +1,4 @@
+﻿.table > :not(caption) > * > * {
+  padding: 0.2rem;
+  font-size: 0.9rem;
+}

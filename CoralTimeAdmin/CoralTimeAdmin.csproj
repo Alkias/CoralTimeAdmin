@@ -4041,6 +4041,7 @@
     <Content Include="Content\fonts\fontawesome\fa-regular-400.svg" />
     <Content Include="Content\fonts\fontawesome\fa-solid-900.svg" />
     <Content Include="Content\fonts\simple-line-icons\Simple-Line-Icons.svg" />
+    <Content Include="Content\scss\custom.css" />
     <Content Include="Content\_js\main\app.js" />
     <Content Include="Content\_js\main\modules\helpers.js" />
     <Content Include="Content\_js\main\modules\template.js" />

@@ -1,7 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@using System.Threading
+@{
+    var currenCulture = Thread.CurrentThread.CurrentCulture;
+    var shortDatePattern = Thread.CurrentThread.CurrentCulture.DateTimeFormat.ShortDatePattern;
+    var dateStringFormat = currenCulture.ToString() == "el" ? "dd/MM/yyyy" : "MM/dd/yyyy";
+}
+<!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
 
@@ -11,6 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
 
     <link href="~/Content/scss/main.css" rel="stylesheet" />
+    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
+    <link href="~/Content/scss/custom.css" rel="stylesheet" />
     @RenderSection("styles", false)
 </head>
 <body>
@@ -108,6 +116,10 @@
     <script src="~/Content/js/dashmix.app.min.js"></script>
     <script src="~/Content/js/lib/jquery.min.js"></script>
     <script src="~/Content/js/plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    @if (currenCulture.ToString() == "el-GR") {
+        <script src="~/Content/js/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.el.min.js"></script>
+    }
 
     @RenderSection("scripts", false)
 
@@ -168,8 +180,6 @@
             return "bottom";
     }
 
-   
-
     jQuery(document).ready(function() {
 
         var noties = @(TempData["Noties"] != null ? Html.Raw(TempData["Noties"]) : Html.Raw("[]"));
@@ -177,6 +187,22 @@
             Dashmix.helpers('jq-notify', applicatioNotieToDashmix(noties[i]));
             //console.log(applicatioNotieToDashmix(noties[i]));
         }
+
+        var currentCulture = ("@(currenCulture)");
+
+        $('.js-datepicker:not(.js-datepicker-enabled)').add('.input-daterange:not(.js-datepicker-enabled)').each((index, element) => {
+            let el = $(element);
+
+            // Add .js-datepicker-enabled class to tag it as activated and init it
+            el.addClass('js-datepicker-enabled').datepicker({
+                weekStart: el.data('week-start') || 0,
+                autoclose: el.data('autoclose') || false,
+                todayHighlight: true,
+                container: el.data('container') || '#page-container',
+                orientation: 'bottom', // Position issue when using BS5, set it to bottom until officially supported
+                language : '@(currenCulture)'
+            });
+        });
     });
     </script>
 </body>

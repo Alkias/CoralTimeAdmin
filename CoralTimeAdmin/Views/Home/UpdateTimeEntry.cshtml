@@ -1,6 +1,11 @@
-﻿@model DayTasks
+﻿@using System.Threading
+@model DayTasks
 @{
     ViewBag.Title = "Update Time Entry";
+
+    var currenCulture = Thread.CurrentThread.CurrentCulture;
+    var shortDatePattern = Thread.CurrentThread.CurrentCulture.DateTimeFormat.ShortDatePattern;
+    var dateStringFormat = currenCulture.ToString() == "el" ? "dd/MM/yyyy" : "MM/dd/yyyy";
 
 }
 <div class="block block-rounded">
@@ -41,8 +46,7 @@
                 </div>
             </div>
             <div class="col-lg-8 col-xl-5">
-                @using (Html.BeginForm("UpdateTimeEntry", "Home", FormMethod.Post, new { @class = "mb-5" }))
-                {
+                @using (Html.BeginForm("UpdateTimeEntry", "Home", FormMethod.Post, new { @class = "mb-5" })) {
 
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Id, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
@@ -53,7 +57,7 @@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "col-sm-3 col-form-label" })
                         <div class="col-sm-9">
-                            @Html.TextBoxFor(model => model.Date, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })
+                            @Html.TextBoxFor(model => model.Date, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy", today_highlight = "true" })
                         </div>
                     </div>
 
@@ -113,23 +117,19 @@
     </div>
 </div>
 @section styles {
-    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
     <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
-
 }
 @section scripts {
-    <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
-    <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    <script>Dashmix.helpersOnLoad(['js-flatpickr']);</script>
     <script src="~/Content/js/jquery.eventlogs.js"></script>
-    <script src="~/Content/js/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.el.min.js"></script>
     <script>
         $(function() {
             var getEvents = $("#get-events").eventlogs({
                 url : "@Url.Action("GetSystemEvents", "Home")",
                 date : "@Model.Date.ToString("d")",
-                startEvent: { tringer: "#event-start", field:"#FromTime" },
-                endEvent: { tringer: "#event-end", field: "#ToTime" }
+                startEvent : { tringer : "#event-start", field : "#FromTime" },
+                endEvent : { tringer : "#event-end", field : "#ToTime" }
             });
         })
     </script>
