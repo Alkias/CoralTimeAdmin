@@ -22,10 +22,10 @@
                     </div>
                     <div class="col-sm-12 col-xl-12">
                         <a id="event-start" class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span></span></a>
-                        <a id="event-end" class="btn btn-sm btn-alt-primary push event-end" href="javascript:void(0)">End: <span id="event-end-val"></span></a>
+                        <a id="event-end" class="btn btn-sm btn-alt-primary push event-end" href="javascript:void(0)">End: <span></span></a>
                     </div>
                 </div>
-                
+
                 <div class="row items-push text-center text-sm-start mb-12">
                     <div class="col-sm-12 col-xl-12">
                         @Model.PreviewsTask.Project,
@@ -33,15 +33,14 @@
                         @Model.PreviewsTask.Description
                     </div>
                     <div class="col-sm-12 col-xl-12">
-                        <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.FromTime.Replace(":000","")</span></a>
+                        <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.FromTime.Replace(":000", "")</span></a>
                         <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.ToTime.Replace(":000", "")</span></a>
                     </div>
                 </div>
 
             </div>
             <div class="col-lg-8 col-xl-5">
-                @using (Html.BeginForm("CreateTimeEntry", "Home", FormMethod.Post, new { @class = "mb-5" }))
-                {
+                @using (Html.BeginForm("CreateTimeEntry", "Home", FormMethod.Post, new { @class = "mb-5" })) {
                     @Html.HiddenFor(model => model.Id)
                     @Html.HiddenFor(model => model.CreatorId)
                     @Html.HiddenFor(model => model.TimeTimerStart)
@@ -54,7 +53,6 @@
                         @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
                         <div class="col-sm-8">
                             <input type="text" class="js-datepicker form-control" data_date_format="dd/MM/yyyy" name="Date" id="Date" value="@Model.Date.ToString("d")" />
-                            @*@Html.TextBoxFor(model => model.Date, "{0:dd/MM/yyyy}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })*@
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -63,7 +61,7 @@
                             @Html.DropDownListFor(model => model.ProjectId, Model.AvailableProjects, new { @class = "form-select" })
                         </div>
                     </div>
-                    
+
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.TaskTypesId, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
                         <div class="col-sm-8">
@@ -74,11 +72,11 @@
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
                         <div class="col-sm-8">
-                            @Html.TextAreaFor(model => model.Description,  new { @class = "form-control", rows="4" } )
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "4" })
                         </div>
                     </div>
-                    
-                    
+
+
                     <div class="row mb-4">
                         @Html.LabelFor(model => model.TimeFromStr, htmlAttributes: new { @class = "col-sm-4 col-form-label" })
                         <div class="col-sm-8">
@@ -117,58 +115,23 @@
 </div>
 
 @section styles {
-    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet"/>
-    <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet"/>
+    <link href="~/Content/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
+    <link href="~/Content/js/plugins/flatpickr/flatpickr.css" rel="stylesheet" />
 }
 
 @section scripts {
     <script src="~/Content/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
     <script>Dashmix.helpersOnLoad(['js-flatpickr', 'jq-datepicker']);</script>
+    <script src="~/Content/js/jquery.eventlogs.js"></script>
+
     <script>
         $(function () {
-            $("#event-start").hide();
-            $("#event-end").hide();;
-            $(document).on("click", "#get-events", function () {
-
-                // Clear old events
-                $("#event-start-val").text("").hide();
-                $("#event-end-val").text("").hide();;
-
-                Dashmix.layout('header_loader_on');
-
-                $.ajax({
-                    method : "POST",
-                    url : "@Url.Action("GetSystemEvents", "Home")",
-                    data: { date : "@Model.Date.ToString("d")" }
-                }).done(function (msg) {
-                    Dashmix.layout('header_loader_off');
-
-                    if (msg.EventStart && msg.EventStart != "") {
-                        $("#event-start").show();
-                        $("#event-start").children("span").text(msg.EventStart).show();
-                    }
-                            
-                    if (msg.EventEnd && msg.EventEnd != "") {
-                        
-                        $("#event-end").show();
-                        $("#event-end").children("span").text(msg.EventEnd).show();
-                    }
-                           
-                });
-            });
-
-            $(document).on("click", ".event-start", function ()
-            {
-                var startVal = $(this).children("span").text();
-                $("#TimeFromStr").val(startVal);
-                $("#TimeFromStr").flatpickr("set", "enable", startVal);
-            });
-
-            $(document).on("click", ".event-end", function () {
-                var endVal = $(this).children("span").text();
-                $("#TimeToStr").val(endVal);
-                $("#TimeToStr").flatpickr("set", "enable", endVal);
+            var getEvents = $("#get-events").eventlogs({
+                url : "@Url.Action("GetSystemEvents", "Home")",
+                date : "@Model.Date.ToString("d")",
+                startEvent: { tringer: "#event-start", field:"#TimeFromStr" },
+                endEvent: { tringer: "#event-end", field: "#TimeToStr" }
             });
         })
     </script>

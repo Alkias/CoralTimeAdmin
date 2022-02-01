@@ -1,125 +1,94 @@
-﻿; (function (window, document, $, undefined) {
+﻿; (function ($, window, document, undefined) {
 
-    'use strict';
+    var pluginName = "eventlogs",
+        dataKey = "plugin_" + pluginName;
 
-    /**
-     * Plugin NAMESPACE and SELECTOR
-     * @type {String}
-     * @api private
-     */
-    var NAMESPACE = 'EventLogs',
-        SELECTOR = '[data-' + NAMESPACE + ']';
+    var Plugin = function (element, options) {
 
-    /**
-     * Plugin constructor
-     * @param {Node} element
-     * @param {Object} [options]
-     * @api public
-     */
-    function Plugin(element, options) {
-        this.options = $.extend(true, $.fn[NAMESPACE].defaults, options);
-        this.$element = $(element);
-    }
+        this.element = element;
 
-    /**
-     * Plugin prototype
-     * @type {Object}
-     * @api public
-     */
+        this.options = {};
+
+        this.init(options);
+    };
+
     Plugin.prototype = {
-        constructor: Plugin,
-        version: '1.0',
-        /**
-         * Init method
-         * @api public
-         */
-        init: function () {
+        init: function (options) {
+            $.extend(true, this.options, options);
+
             $("#event-start").hide();
-            $("#event-end").hide();;
-            $(document).on("click", "#get-events", function () {
+            $("#event-end").hide();
 
-                // Clear old events
-                $("#event-start-val").text("").hide();
-                $("#event-end-val").text("").hide();;
+            this.element.on("click", this.options, this.setSystemEvents);
 
-                Dashmix.layout('header_loader_on');
-
-                $.ajax({
-                    method: "POST",
-                    url: options.url,
-                    data: { date: options.date }
-                }).done(function (msg) {
-                    Dashmix.layout('header_loader_off');
-
-                    if (msg.EventStart && msg.EventStart != "") {
-
-                        $("#event-start").show();
-                        $("#event-start-val").text(msg.EventStart).show();
-
-                    }
-
-                    if (msg.EventEnd && msg.EventEnd != "") {
-
-                        $("#event-end").show();
-                        $("#event-end-val").text(msg.EventEnd).show();
-                    }
-
-                });
-            });
-
-            $(document).on("click", "#event-start", function () {
-
-                $("#FromTime").val($(this).find("#event-start-val").text());
-                var data = $("#event-start-val").text();
-                $("#FromTime").flatpickr("set", "enable", data);
-            });
-
-            $(document).on("click", "#event-end", function () {
-                $("#ToTime").val($(this).find("#event-end-val").text());
-                var data = $("#event-end-val").text();
-                $("#ToTime").flatpickr("set", "enable", data);
-            });
-        }
-        // @todo add methods
-    };
-
-    /**
-     * jQuery plugin definition
-     * @param  {String} [method]
-     * @param  {Object} [options]
-     * @return {Object}
-     * @api public
-     */
-    $.fn[NAMESPACE] = function (method, options) {
-        return this.each(function () {
-            var $this = $(this),
-                data = $this.data('fn.' + NAMESPACE);
-            options = (typeof method === 'object') ? method : options;
-            if (!data) {
-                $this.data('fn.' + NAMESPACE, (data = new Plugin(this, options)));
+            if (this.options.startEvent) {
+                $(this.options.startEvent.tringer).on("click", this.options, this.setStratTime);
             }
-            data[(typeof method === 'string') ? method : 'init']();
-        });
+
+            if (this.options.startEvent) {
+                $(this.options.endEvent.tringer).on("click", this.options, this.setEndTime);
+            }
+        },
+
+        setSystemEvents: function (event) {
+            Dashmix.layout('header_loader_on');
+
+            $.ajax({
+                method: "POST",
+                url: event.data.url,
+                data: { date: event.data.date }
+            }).done(function (msg) {
+                Dashmix.layout('header_loader_off');
+
+                if (msg.EventStart && msg.EventStart != "") {
+                    var startElm = $("#event-start");
+                    startElm.show();
+                    startElm.find("span").text(msg.EventStart);
+                    event.data.startTime = msg.EventStart;
+                }
+
+                if (msg.EventEnd && msg.EventEnd != "") {
+
+                    var endElm = $("#event-end");
+                    endElm.show();
+                    endElm.find("span").text(msg.EventEnd);
+                    event.data.endTime = msg.EventEnd;
+                }
+
+            });
+            return this;
+        },
+
+        setStratTime: function (event) {
+            $(event.data.startEvent.field).val(event.data.startTime);
+        },
+
+        setEndTime: function (event) {
+            $(event.data.endEvent.field).val(event.data.endTime);
+        }
+
     };
 
-    /**
-     * jQuery plugin defaults
-     * @type {Object}
-     * @api public
+    /*
+     * Plugin wrapper, preventing against multiple instantiations and
+     * return plugin instance.
      */
-    $.fn[NAMESPACE].defaults = {
-        // @todo add defaults
-        url: "",
-        date:""
+    $.fn[pluginName] = function (options) {
+
+        var plugin = this.data(dataKey);
+
+        // has plugin instantiated ?
+        if (plugin instanceof Plugin) {
+            // if have options arguments, call plugin.init() again
+            if (typeof options !== 'undefined') {
+                plugin.init(options);
+            }
+        } else {
+            plugin = new Plugin(this, options);
+            this.data(dataKey, plugin);
+        }
+
+        return plugin;
     };
 
-    /**
-     * jQuery plugin data api
-     * @api public
-     */
-    $(document).on('click.' + NAMESPACE, SELECTOR, function (event) {
-        $(this)[NAMESPACE]();
-        event.preventDefault();
-    });
-
-}(this, this.document, this.jQuery));
+}(jQuery, window, document));
