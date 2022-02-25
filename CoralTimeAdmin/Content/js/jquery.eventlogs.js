@@ -25,8 +25,16 @@
                 $(this.options.startEvent.tringer).on("click", this.options, this.setStratTime);
             }
 
-            if (this.options.startEvent) {
+            if (this.options.endEvent) {
                 $(this.options.endEvent.tringer).on("click", this.options, this.setEndTime);
+            }
+
+            if (this.options.startEventFromPrevious) {
+                $(this.options.startEventFromPrevious.tringer).on("click", this.options, this.setStratTimeFromPreview);
+            }
+
+            if (this.options.endEventFromPrevious) {
+                $(this.options.endEventFromPrevious.tringer).on("click", this.options, this.setEndTimeFromPreview);
             }
         },
 
@@ -65,6 +73,18 @@
 
         setEndTime: function (event) {
             $(event.data.endEvent.field).val(event.data.endTime);
+        },
+
+        setStratTimeFromPreview: function (event) {
+            var time = $(event.data.startEventFromPrevious.tringer).find("span").text();
+            $(event.data.startEvent.field).val(time);
+            $(event.data.endEvent.field).val(time);
+        },
+
+        setEndTimeFromPreview: function (event) {
+            var time = $(event.data.endEventFromPrevious.tringer).find("span").text();
+            $(event.data.startEvent.field).val(time);
+            $(event.data.endEvent.field).val(time);
         }
 
     };

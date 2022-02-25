@@ -87,14 +87,7 @@ namespace CoralTimeAdmin.Controllers
             //https://stackoverflow.com/questions/35950402/how-to-insert-datetime2
             //https://stackoverflow.com/questions/11231614/how-can-i-get-dapper-to-map-net-datetime-to-datetime2
 
-            DateTime _timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
-            DateTime _timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
-
-            model.TimeFrom = (int) (_timeFrom - model.Date.Date).TotalSeconds;
-            model.TimeTo = (int) (_timeTo - model.Date.Date).TotalSeconds;
-            model.TimeActual = model.TimeTo - model.TimeFrom;
-
-            var tempDate = ConvertEntryDatesFromStartTime(model.Date, _timeFrom);
+            var tempDate = SetDatetime2ParamsToModel(model);
 
             var parameters = new DynamicParameters();
             parameters.Add("@creationDate", tempDate, DbType.DateTime2, ParameterDirection.Input, 7);
@@ -114,10 +107,44 @@ namespace CoralTimeAdmin.Controllers
             parameters.Add("@timeTo", model.TimeTo, DbType.Int32);
             parameters.Add("@new_identity", null, DbType.Int32, ParameterDirection.Output);
 
+
+            /*
+             @creationDate		datetime2(7),
+	        @creatorId			nvarchar(450),
+	        @date				datetime2(7),
+	        @description		nvarchar(1000),
+	        @isFromToShow		bit,
+	        @lastEditorUserId	nvarchar(450),
+	        @lastUpdateDate		datetime2(7),
+	        @memberId			int,
+	        @timeEstimated		int,
+	        @projectId			int,
+	        @taskTypesId		int,
+	        @timeActual			int,
+	        @timeFrom			int,
+	        @timeTimerStart		int,
+	        @timeTo				int,
+	        @new_identity		int = NULL OUTPUT
+             */
+
+            //Procedure or function 'InsetTimeEntry' expects parameter '@timeFrom', which was not supplied.
+
             var result = await _dapper.ExecProc<TimeEntries>("InsetTimeEntry", parameters);
             var newId = parameters.Get<int>("@new_identity");
 
             return RedirectToAction("UpdateTimeEntry", new {id = newId});
+        }
+
+        private static DateTime SetDatetime2ParamsToModel (TimeEntriesModel model) {
+            DateTime timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
+            DateTime timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
+
+            model.TimeFrom = (int) (timeFrom - model.Date.Date).TotalSeconds;
+            model.TimeTo = (int) (timeTo - model.Date.Date).TotalSeconds;
+            model.TimeActual = model.TimeTo - model.TimeFrom;
+
+            var tempDate = ConvertEntryDatesFromStartTime(model.Date, timeFrom);
+            return tempDate;
         }
 
         public async Task<ActionResult> UpdateTimeEntry (int id) {
@@ -322,23 +349,24 @@ namespace CoralTimeAdmin.Controllers
         }
 
         /// <summary>
-        /// Create a datetime 2(7) type combine a Datetime and startTime
+        /// Adds to DateTime without a time part the time part of another DateTime
         /// </summary>
         /// <param name="date">Base Datetime</param>
-        /// <param name="timeFrom">Base StartTime</param>
+        /// <param name="timePart">Base StartTime</param>
         /// <returns></returns>
-        private static DateTime ConvertEntryDatesFromStartTime (DateTime date, DateTime timeFrom) {
+        private static DateTime ConvertEntryDatesFromStartTime (DateTime date, DateTime timePart) {
             var tempDate = date.Date;
             var rnd = new Random();
-            var h = (int) (timeFrom - date.Date).TotalHours;
-            var m = (int) (timeFrom - date.Date).TotalMinutes;
-            var s = (int) (timeFrom - date.Date).TotalSeconds;
+            var h = (int) (timePart - date.Date).TotalHours;
+            var m = (int) (timePart - date.Date).TotalMinutes;
+            var s = (int) (timePart - date.Date).TotalSeconds;
             var ms = rnd.Next(1000000, 9999999);
 
-            tempDate.AddHours(h);
-            tempDate.AddMinutes(m);
-            tempDate.AddSeconds(s);
-            tempDate.AddTicks(ms);
+            //tempDate = tempDate.AddHours(h).AddMinutes(m).AddSeconds(s).AddTicks(ms);
+            tempDate = tempDate.AddSeconds(s).AddTicks(ms);
+            //tempDate.AddMinutes(m);
+            //tempDate.AddSeconds(s);
+            //tempDate.AddTicks(ms);
 
             return tempDate;
         }

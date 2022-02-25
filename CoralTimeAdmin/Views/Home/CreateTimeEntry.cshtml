@@ -7,7 +7,7 @@
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
-            <a href="@Url.Action("Index", new{dateString=Model.Date.ToString("d")})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
+            <a href="@Url.Action("Index", new{dateString=Model.Date.ToString("dd/MM/yyyy")})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
         </div>
     </div>
     <div class="block-content">
@@ -33,8 +33,8 @@
                         @Model.PreviewsTask.Description
                     </div>
                     <div class="col-sm-12 col-xl-12">
-                        <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.FromTime.Replace(":000", "")</span></a>
-                        <a class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.ToTime.Replace(":000", "")</span></a>
+                        <a id="event-prev-start" class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.FromTime.Replace(":000", "")</span></a>
+                        <a id="event-prev-end" class="btn btn-sm btn-alt-primary push event-start" href="javascript:void(0)">Start: <span>@Model.PreviewsTask.ToTime.Replace(":000", "")</span></a>
                     </div>
                 </div>
 
@@ -121,7 +121,7 @@
 @section scripts {
     <script src="~/Content/js/plugins/flatpickr/flatpickr.min.js"></script>
     <script>Dashmix.helpersOnLoad(['js-flatpickr']);</script>
-    <script src="~/Content/js/jquery.eventlogs.js"></script>
+    <script src="~/Content/js/jquery.eventlogs.js?v=13"></script>
 
     <script>
         $(function () {
@@ -129,7 +129,9 @@
                 url : "@Url.Action("GetSystemEvents", "Home")",
                 date : "@Model.Date.ToString("d")",
                 startEvent: { tringer: "#event-start", field:"#TimeFromStr" },
-                endEvent: { tringer: "#event-end", field: "#TimeToStr" }
+                endEvent: { tringer: "#event-end", field: "#TimeToStr" },
+                startEventFromPrevious: { tringer: "#event-prev-start", field: "#TimeFromStr"},
+                endEventFromPrevious: { tringer: "#event-prev-end", field: "#TimeToStr"}
             });
         })
     </script>
