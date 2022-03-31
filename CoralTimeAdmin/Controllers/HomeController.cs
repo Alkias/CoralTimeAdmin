@@ -165,16 +165,16 @@ namespace CoralTimeAdmin.Controllers
         public async Task<ActionResult> UpdateTimeEntry (DayTasks model) {
             var rnd = new Random();
 
-            string creationDateStr = null, lastUpdateDateStr = null;
-            DateTime creationDate, lastUpdateDate;
+            string creationDateStr = null;
             var cultureProvider = new CultureInfo("el-GR");
             var format = "dd/MM/yyyy HH:mm:ss.fffffff";
             try {
-                creationDateStr = model.Date.ToString().Replace(" 00:00:00", "") + " " + model.FromTime + "." + rnd.Next(1000000, 9999999);
-                lastUpdateDateStr = model.Date.ToString().Replace(" 00:00:00", "") + " " + model.ToTime + "." + rnd.Next(1000000, 9999999);
 
-                creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
-                lastUpdateDate = DateTime.ParseExact(lastUpdateDateStr, format, cultureProvider);
+                creationDateStr = model.Date.ToString("dd/MM/yyyy") + " " + model.FromTime + "." + rnd.Next(1000000, 9999999);
+                var lastUpdateDateStr = model.Date.ToString("dd/MM/yyyy") + " " + model.FromTime + "." + rnd.Next(1000000, 9999999);
+
+                var creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
+                var lastUpdateDate = DateTime.ParseExact(lastUpdateDateStr, format, cultureProvider);
 
                 var parameters = new DynamicParameters();
                 parameters.Add("@timeEntryId", model.Id, DbType.Int32);
