@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using CoralTimeAdmin.DAL.Entities;
 
 namespace CoralTimeAdmin.Models
 {

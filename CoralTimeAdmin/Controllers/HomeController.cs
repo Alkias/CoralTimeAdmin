@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using CoralTimeAdmin.DAL.Entities;
-using CoralTimeAdmin.Helpers;
 using CoralTimeAdmin.Models;
 using CoralTimeAdmin.Repositories;
 using Dapper;
@@ -28,7 +25,8 @@ namespace CoralTimeAdmin.Controllers
 
         #region Ctor
 
-        public HomeController (IDapperRepository dapper, IRepository<TimeEntries> repository) {
+        public HomeController(IDapperRepository dapper,
+            IRepository<TimeEntries> repository) {
             _dapper = dapper;
             _repository = repository;
         }
@@ -37,16 +35,13 @@ namespace CoralTimeAdmin.Controllers
 
         #region Methods
 
-       
-        public ActionResult Index (DateTime? dateString) {
-            //DateTime taskDay = !dateString.IsNullOrWhiteSpace() ? dateString.ToDate() : DateTime.Now;
-            DateTime taskDay = dateString??DateTime.Now;
+        public ActionResult Index(DateTime? searchDate) {
+            DateTime taskDay = searchDate ?? DateTime.Now;
             return View(taskDay);
         }
 
         [HttpPost]
-        public async Task<ActionResult> GetDayTasksResult (DateTime date) {
-
+        public async Task<ActionResult> GetDayTasksResult(DateTime date) {
             IList<DayTasks> dayTasks = await GetDayTasks(date);
 
             ViewBag.CreateDate = date.Date;
@@ -54,9 +49,9 @@ namespace CoralTimeAdmin.Controllers
             return PartialView(dayTasks);
         }
 
-        private async Task<IList<DayTasks>> GetDayTasks (DateTime date) {
+        private async Task<IList<DayTasks>> GetDayTasks(DateTime date) {
             var @params = new DynamicParameters(
-                new {date = date.ToString("yyyy-MM-dd")}
+                new { date = date.ToString("yyyy-MM-dd") }
             );
 
             IList<DayTasks> result = await _dapper.ExecProc<DayTasks>("GetEntriesForDay", @params);
@@ -67,8 +62,7 @@ namespace CoralTimeAdmin.Controllers
 
         #region CRUD
 
-        public async Task<ActionResult> CreateTimeEntry (DateTime date) {
-
+        public async Task<ActionResult> CreateTimeEntry(DateTime date) {
             IList<DayTasks> dayTasks = await GetDayTasks(date);
 
             var model = new TimeEntriesModel {
@@ -85,7 +79,7 @@ namespace CoralTimeAdmin.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateTimeEntry (TimeEntriesModel model) {
+        public async Task<ActionResult> CreateTimeEntry(TimeEntriesModel model) {
             //https://stackoverflow.com/questions/35950402/how-to-insert-datetime2
             //https://stackoverflow.com/questions/11231614/how-can-i-get-dapper-to-map-net-datetime-to-datetime2
 
@@ -109,48 +103,25 @@ namespace CoralTimeAdmin.Controllers
             parameters.Add("@timeTo", model.TimeTo, DbType.Int32);
             parameters.Add("@new_identity", null, DbType.Int32, ParameterDirection.Output);
 
-
-            /*
-             @creationDate		datetime2(7),
-	        @creatorId			nvarchar(450),
-	        @date				datetime2(7),
-	        @description		nvarchar(1000),
-	        @isFromToShow		bit,
-	        @lastEditorUserId	nvarchar(450),
-	        @lastUpdateDate		datetime2(7),
-	        @memberId			int,
-	        @timeEstimated		int,
-	        @projectId			int,
-	        @taskTypesId		int,
-	        @timeActual			int,
-	        @timeFrom			int,
-	        @timeTimerStart		int,
-	        @timeTo				int,
-	        @new_identity		int = NULL OUTPUT
-             */
-
-            //Procedure or function 'InsetTimeEntry' expects parameter '@timeFrom', which was not supplied.
-
             var result = await _dapper.ExecProc<TimeEntries>("InsetTimeEntry", parameters);
             var newId = parameters.Get<int>("@new_identity");
 
-            return RedirectToAction("UpdateTimeEntry", new {id = newId});
+            return RedirectToAction("UpdateTimeEntry", new { id = newId });
         }
 
-        private static DateTime SetDatetime2ParamsToModel (TimeEntriesModel model) {
+        private static DateTime SetDatetime2ParamsToModel(TimeEntriesModel model) {
             DateTime timeFrom = model.Date.Date + TimeSpan.Parse(model.TimeFromStr);
             DateTime timeTo = model.Date.Date + TimeSpan.Parse(model.TimeToStr);
 
-            model.TimeFrom = (int) (timeFrom - model.Date.Date).TotalSeconds;
-            model.TimeTo = (int) (timeTo - model.Date.Date).TotalSeconds;
+            model.TimeFrom = (int)(timeFrom - model.Date.Date).TotalSeconds;
+            model.TimeTo = (int)(timeTo - model.Date.Date).TotalSeconds;
             model.TimeActual = model.TimeTo - model.TimeFrom;
 
             var tempDate = ConvertEntryDatesFromStartTime(model.Date, timeFrom);
             return tempDate;
         }
 
-        public async Task<ActionResult> UpdateTimeEntry (int id) {
-
+        public async Task<ActionResult> UpdateTimeEntry(int id) {
             DayTasks dayTask = await GetDayTaskById(id);
 
             if (dayTask != null) {
@@ -164,15 +135,16 @@ namespace CoralTimeAdmin.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpdateTimeEntry (DayTasks model) {
+        public async Task<ActionResult> UpdateTimeEntry(DayTasks model) {
             var rnd = new Random();
 
             string creationDateStr = null;
             var cultureProvider = new CultureInfo("el-GR");
             var format = "dd/MM/yyyy HH:mm:ss.fffffff";
-            try {
 
+            try {
                 creationDateStr = model.Date.ToString("dd/MM/yyyy") + " " + model.FromTime + "." + rnd.Next(1000000, 9999999);
+
                 var lastUpdateDateStr = model.Date.ToString("dd/MM/yyyy") + " " + model.FromTime + "." + rnd.Next(1000000, 9999999);
 
                 var creationDate = DateTime.ParseExact(creationDateStr, format, cultureProvider);
@@ -197,10 +169,10 @@ namespace CoralTimeAdmin.Controllers
                 Console.WriteLine("{0} is not in the correct format.", creationDateStr);
             }
 
-            return RedirectToAction("UpdateTimeEntry", new {id = model.Id});
+            return RedirectToAction("UpdateTimeEntry", new { id = model.Id });
         }
 
-        public ActionResult DeleteTimeEntry (int id) {
+        public ActionResult DeleteTimeEntry(int id) {
             var timeEntries = _repository.GetById(id);
             var date = timeEntries.Date;
 
@@ -208,7 +180,7 @@ namespace CoralTimeAdmin.Controllers
 
             Success("Time Entry Deleted Successfully");
 
-            return RedirectToAction("Index", new { dateString = date});
+            return RedirectToAction("Index", new { searchDate = date });
         }
 
         /// <summary>
@@ -217,8 +189,7 @@ namespace CoralTimeAdmin.Controllers
         /// <param name="date">Requested date</param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult GetSystemEvents (DateTime date) {
-
+        public ActionResult GetSystemEvents(DateTime date) {
             EventLog eventLog = new EventLog {
                 Log = "System",
                 Source = "EventLoggingApp",
@@ -229,7 +200,7 @@ namespace CoralTimeAdmin.Controllers
 
             var dayEvents = eventLogEntries.Cast<EventLogEntry>()
                 .Where(x => x.TimeGenerated.Date == date)
-                .Select(x => new {x.TimeGenerated})
+                .Select(x => new { x.TimeGenerated })
                 .ToList();
 
             return Json(
@@ -243,7 +214,8 @@ namespace CoralTimeAdmin.Controllers
 
         #region Privates
 
-        private void EntityToModel (TimeEntries entity, TimeEntriesModel model) {
+        private void EntityToModel(TimeEntries entity,
+            TimeEntriesModel model) {
             model.CreationDate = entity.CreationDate;
             model.CreatorId = entity.CreatorId;
             model.Date = entity.Date;
@@ -261,8 +233,27 @@ namespace CoralTimeAdmin.Controllers
             model.TimeTo = entity.TimeTo;
         }
 
-        private async Task<DayTasks> GetDayTaskById (int id) {
-            var sqlParams = new DynamicParameters(new {id});
+        private void ModelToEntity(TimeEntriesModel model,
+            TimeEntries entity) {
+            entity.CreationDate = model.CreationDate;
+            entity.CreatorId = model.CreatorId;
+            entity.Date = model.Date;
+            entity.Description = model.Description;
+            entity.IsFromToShow = model.IsFromToShow;
+            entity.LastEditorUserId = model.LastEditorUserId;
+            entity.LastUpdateDate = model.LastUpdateDate;
+            entity.MemberId = model.MemberId;
+            entity.TimeEstimated = model.TimeEstimated;
+            entity.ProjectId = model.ProjectId;
+            entity.TaskTypesId = model.TaskTypesId;
+            entity.TimeActual = model.TimeActual;
+            entity.TimeFrom = model.TimeFrom;
+            entity.TimeTimerStart = model.TimeTimerStart;
+            entity.TimeTo = model.TimeTo;
+        }
+
+        private async Task<DayTasks> GetDayTaskById(int id) {
+            var sqlParams = new DynamicParameters(new { id });
             var result = await _dapper.ExecProc<DayTasks>("GetEntryById", sqlParams);
 
             var timeEntry = result.FirstOrDefault();
@@ -281,36 +272,19 @@ namespace CoralTimeAdmin.Controllers
             return execResult.ToList();
         }
 
-        private async Task<TimeEntries> GetTimeEntryFromId (int id) {
+        private async Task<TimeEntries> GetTimeEntryFromId(int id) {
             var parameters = new DynamicParameters(
                 new {
                     timeEntryId = id
                 });
 
-            var execResult = await _dapper.ExecScalarSql<TimeEntries>("SELECT * FROM TimeEntries WHERE id=@id", parameters);
+            var execResult =
+                await _dapper.ExecScalarSql<TimeEntries>("SELECT * FROM TimeEntries WHERE id=@id", parameters);
 
             return execResult;
         }
 
-        private void ModelToEntity (TimeEntriesModel model, TimeEntries entity) {
-            entity.CreationDate = model.CreationDate;
-            entity.CreatorId = model.CreatorId;
-            entity.Date = model.Date;
-            entity.Description = model.Description;
-            entity.IsFromToShow = model.IsFromToShow;
-            entity.LastEditorUserId = model.LastEditorUserId;
-            entity.LastUpdateDate = model.LastUpdateDate;
-            entity.MemberId = model.MemberId;
-            entity.TimeEstimated = model.TimeEstimated;
-            entity.ProjectId = model.ProjectId;
-            entity.TaskTypesId = model.TaskTypesId;
-            entity.TimeActual = model.TimeActual;
-            entity.TimeFrom = model.TimeFrom;
-            entity.TimeTimerStart = model.TimeTimerStart;
-            entity.TimeTo = model.TimeTo;
-        }
-
-        private void PrepareTimeEntryModel (TimeEntriesModel model) {
+        private void PrepareTimeEntryModel(TimeEntriesModel model) {
             model.CreatorId = _creatorId;
             model.LastEditorUserId = _creatorId;
             model.Date = model.Date; // DateTime.Now;
@@ -323,7 +297,7 @@ namespace CoralTimeAdmin.Controllers
         }
 
         [NonAction]
-        private async Task PrepareTimeEntryModelSelectionLists<T> (T model) where T : ViewModelBase {
+        private async Task PrepareTimeEntryModelSelectionLists<T>(T model) where T : ViewModelBase {
             if (model == null)
                 throw new ArgumentNullException("model");
 
@@ -333,21 +307,19 @@ namespace CoralTimeAdmin.Controllers
             model.AvailableProjects = new List<SelectListItem>();
             model.AvailableTasks = new List<SelectListItem>();
 
-            foreach (var project in availableProjects) {
+            foreach (var project in availableProjects)
                 model.AvailableProjects.Add(
                     new SelectListItem {
                         Text = project.Name,
                         Value = project.Id.ToString()
                     });
-            }
 
-            foreach (var type in availableTaskTypes) {
+            foreach (var type in availableTaskTypes)
                 model.AvailableTasks.Add(
                     new SelectListItem {
                         Text = type.Name,
                         Value = type.Id.ToString()
                     });
-            }
         }
 
         /// <summary>
@@ -356,19 +328,16 @@ namespace CoralTimeAdmin.Controllers
         /// <param name="date">Base Datetime</param>
         /// <param name="timePart">Base StartTime</param>
         /// <returns></returns>
-        private static DateTime ConvertEntryDatesFromStartTime (DateTime date, DateTime timePart) {
+        private static DateTime ConvertEntryDatesFromStartTime(DateTime date,
+            DateTime timePart) {
             var tempDate = date.Date;
             var rnd = new Random();
-            var h = (int) (timePart - date.Date).TotalHours;
-            var m = (int) (timePart - date.Date).TotalMinutes;
-            var s = (int) (timePart - date.Date).TotalSeconds;
+            var h = (int)(timePart - date.Date).TotalHours;
+            var m = (int)(timePart - date.Date).TotalMinutes;
+            var s = (int)(timePart - date.Date).TotalSeconds;
             var ms = rnd.Next(1000000, 9999999);
 
-            //tempDate = tempDate.AddHours(h).AddMinutes(m).AddSeconds(s).AddTicks(ms);
             tempDate = tempDate.AddSeconds(s).AddTicks(ms);
-            //tempDate.AddMinutes(m);
-            //tempDate.AddSeconds(s);
-            //tempDate.AddTicks(ms);
 
             return tempDate;
         }

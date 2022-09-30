@@ -4042,36 +4042,6 @@
     <Content Include="Content\fonts\fontawesome\fa-solid-900.svg" />
     <Content Include="Content\fonts\simple-line-icons\Simple-Line-Icons.svg" />
     <Content Include="Content\scss\custom.css" />
-    <Content Include="Content\_js\main\app.js" />
-    <Content Include="Content\_js\main\modules\helpers.js" />
-    <Content Include="Content\_js\main\modules\template.js" />
-    <Content Include="Content\_js\pages\be_comp_calendar.js" />
-    <Content Include="Content\_js\pages\be_comp_charts.js" />
-    <Content Include="Content\_js\pages\be_comp_chat.js" />
-    <Content Include="Content\_js\pages\be_comp_dialogs.js" />
-    <Content Include="Content\_js\pages\be_comp_image_cropper.js" />
-    <Content Include="Content\_js\pages\be_comp_maps_vector.js" />
-    <Content Include="Content\_js\pages\be_comp_nestable.js" />
-    <Content Include="Content\_js\pages\be_comp_onboarding.js" />
-    <Content Include="Content\_js\pages\be_comp_rating.js" />
-    <Content Include="Content\_js\pages\be_forms_validation.js" />
-    <Content Include="Content\_js\pages\be_pages_dashboard.js" />
-    <Content Include="Content\_js\pages\be_pages_dashboard_v1.js" />
-    <Content Include="Content\_js\pages\be_pages_ecom_dashboard.js" />
-    <Content Include="Content\_js\pages\be_pages_projects_tasks.js" />
-    <Content Include="Content\_js\pages\be_tables_datatables.js" />
-    <Content Include="Content\_js\pages\be_ui_animations.js" />
-    <Content Include="Content\_js\pages\be_ui_icons.js" />
-    <Content Include="Content\_js\pages\be_ui_progress.js" />
-    <Content Include="Content\_js\pages\db_analytics.js" />
-    <Content Include="Content\_js\pages\db_corporate_slim.js" />
-    <Content Include="Content\_js\pages\db_crypto.js" />
-    <Content Include="Content\_js\pages\op_auth_lock.js" />
-    <Content Include="Content\_js\pages\op_auth_reminder.js" />
-    <Content Include="Content\_js\pages\op_auth_signin.js" />
-    <Content Include="Content\_js\pages\op_auth_signup.js" />
-    <Content Include="Content\_js\pages\op_coming_soon.js" />
-    <Content Include="Content\_js\pages\op_installation.js" />
     <Content Include="Content\scss\main.css">
       <DependentUpon>main.scss</DependentUpon>
     </Content>

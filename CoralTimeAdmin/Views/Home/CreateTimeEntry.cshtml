@@ -7,7 +7,7 @@
     <div class="block-header block-header-default block-header-rtl">
         <h3 class="block-title">@ViewBag.Title</h3>
         <div class="block-options">
-            <a href="@Url.Action("Index", new{dateString=Model.Date.ToString("dd/MM/yyyy")})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
+            <a href="@Url.Action("Index", new{searchDate=Model.Date.ToString("dd/MM/yyyy")})" class="btn btn-sm btn-secondary"><i class="fa fa-angle-left"></i> Back to Index</a>
         </div>
     </div>
     <div class="block-content">

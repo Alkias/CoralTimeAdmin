@@ -184,7 +184,6 @@
         var noties = @(TempData["Noties"] != null ? Html.Raw(TempData["Noties"]) : Html.Raw("[]"));
         for (var i = 0; i < noties.length; i++) {
             Dashmix.helpers('jq-notify', applicatioNotieToDashmix(noties[i]));
-            //console.log(applicatioNotieToDashmix(noties[i]));
         }
 
         var currentCulture = ("@(currenCulture)");

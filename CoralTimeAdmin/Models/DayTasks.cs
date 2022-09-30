@@ -18,7 +18,6 @@ namespace CoralTimeAdmin.Models
 
         public string TaskDescription { get; set; }
 
-        //[DisplayFormat(DataFormatString = "{0:d}")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime Date { get; set; }
 
