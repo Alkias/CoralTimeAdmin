@@ -2,7 +2,7 @@
 @{
     var currenCulture = Thread.CurrentThread.CurrentCulture;
     var shortDatePattern = Thread.CurrentThread.CurrentCulture.DateTimeFormat.ShortDatePattern;
-    var dateStringFormat = currenCulture.ToString() == "el" ? "dd/MM/yyyy" : "MM/dd/yyyy";
+    var dateStringFormat = currenCulture.ToString() == "el-GR" ? "dd/MM/yyyy" : "MM/dd/yyyy";
 }
 <!DOCTYPE html>
 <html lang="el">
@@ -10,7 +10,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
-
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

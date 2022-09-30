@@ -22,7 +22,7 @@ namespace CoralTimeAdmin.Models
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime Date { get; set; }
 
-        public string LastUpdateDate { get; set; }
+        public DateTime LastUpdateDate { get; set; }
 
         public string Description { get; set; }
 

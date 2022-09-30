@@ -37,8 +37,10 @@ namespace CoralTimeAdmin.Controllers
 
         #region Methods
 
-        public ActionResult Index (string dateString) {
-            DateTime taskDay = !dateString.IsNullOrWhiteSpace() ? dateString.ToDate() : DateTime.Now;
+       
+        public ActionResult Index (DateTime? dateString) {
+            //DateTime taskDay = !dateString.IsNullOrWhiteSpace() ? dateString.ToDate() : DateTime.Now;
+            DateTime taskDay = dateString??DateTime.Now;
             return View(taskDay);
         }
 
@@ -206,7 +208,7 @@ namespace CoralTimeAdmin.Controllers
 
             Success("Time Entry Deleted Successfully");
 
-            return RedirectToAction("Index", new { dateString = date.ToString("d")});
+            return RedirectToAction("Index", new { dateString = date});
         }
 
         /// <summary>

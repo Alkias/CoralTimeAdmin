@@ -47,45 +47,87 @@
                     </thead>
 
                     <tbody>
-                    @foreach (var item in Model) {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Project)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Task)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Date)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.LastUpdateDate)
-                            </td>
-                            <td style="width:40%">
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.FromTime)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ToTime)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Duration)
-                            </td>
+                        @*@foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Project)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Task)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Date.ToString("d"))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastUpdateDate)
+                                </td>
+                                <td style="width:40%">
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FromTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ToTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Duration)
+                                </td>
 
-                            <td class="text-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-primary js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Edit" onclick="location.href = '@Url.Action("UpdateTimeEntry", "Home", new {id = item.Id})'">
-                                        <i class="fa fa-pencil-alt"></i>
-                                    </button>
-                                    <button id="deleteBtn" type="button" class="btn btn-sm btn-danger js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Delete" data-id="@item.Id">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-primary js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Edit" onclick="location.href = '@Url.Action("UpdateTimeEntry", "Home", new {id = item.Id})'">
+                                            <i class="fa fa-pencil-alt"></i>
+                                        </button>
+                                        <button id="deleteBtn" type="button" class="btn btn-sm btn-danger js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Delete" data-id="@item.Id">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }*@
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Project
+                                </td>
+                                <td>
+                                    @item.Task
+                                </td>
+                                <td>
+                                    @item.Date.ToString("d")
+                                </td>
+                                <td>
+                                    @item.LastUpdateDate.ToString("dd/MM/yyyy HH:mm:ss")
+                                </td>
+                                <td style="width:40%">
+                                    @item.Description
+                                </td>
+                                <td>
+                                    @item.FromTime
+                                </td>
+                                <td>
+                                    @item.ToTime
+                                </td>
+                                <td>
+                                    @item.Duration
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-primary js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Edit" onclick="location.href = '@Url.Action("UpdateTimeEntry", "Home", new {id = item.Id})'">
+                                            <i class="fa fa-pencil-alt"></i>
+                                        </button>
+                                        <button id="deleteBtn" type="button" class="btn btn-sm btn-danger js-bs-tooltip-enabled" data-bs-toggle="tooltip" title="" data-bs-original-title="Delete" data-id="@item.Id">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
 
                     </tbody>
                 </table>

@@ -5,7 +5,7 @@
 }
 <div class="block block-rounded">
     <div class="block-content">
-        <!-- Inline Layout -->
+        
         <h2 class="content-heading">Day Task</h2>
 
         <div class="row">
@@ -18,7 +18,7 @@
                 @using (Ajax.BeginForm("GetDayTasksResult", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "TasksData" }, new { @class = "row row-cols-lg-auto g-3 align-items-center", id="form-index" }))
                 {
                     <div class="col-12">
-                        @Html.TextBoxFor(model => model.Date, "{0:d}", new { @class = "js-datepicker form-control", data_date_format = "dd/mm/yyyy" })
+                        @Html.TextBoxFor(model => model.Date, "{0:d}", new { @class = "js-datepicker form-control" })
                     </div>
                     <div>
                         <button type="submit" class="btn btn-primary">Search</button>
