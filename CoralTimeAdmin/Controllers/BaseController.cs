@@ -5,6 +5,7 @@ using CoralTimeAdmin.Helpers;
 
 namespace CoralTimeAdmin.Controllers
 {
+    [ErrorHandling]
     public abstract class BaseController : Controller
     {
         #region Noties

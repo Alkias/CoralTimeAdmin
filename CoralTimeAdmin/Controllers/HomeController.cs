@@ -10,6 +10,7 @@ using CoralTimeAdmin.DAL.Entities;
 using CoralTimeAdmin.Models;
 using CoralTimeAdmin.Repositories;
 using Dapper;
+using Microsoft.Extensions.Logging;
 
 namespace CoralTimeAdmin.Controllers
 {
@@ -19,16 +20,21 @@ namespace CoralTimeAdmin.Controllers
 
         private readonly IDapperRepository _dapper;
         private readonly IRepository<TimeEntries> _repository;
+        private readonly ILogger<HomeController> _logger;
         private string _creatorId = "7982c3af-5da6-447d-ab5a-7fda12d750c1";
 
         #endregion
 
         #region Ctor
 
-        public HomeController(IDapperRepository dapper,
-            IRepository<TimeEntries> repository) {
+        public HomeController(
+            IDapperRepository dapper,
+            IRepository<TimeEntries> repository,
+            ILogger<HomeController> logger
+        ) {
             _dapper = dapper;
             _repository = repository;
+            _logger = logger;
         }
 
         #endregion
@@ -36,6 +42,15 @@ namespace CoralTimeAdmin.Controllers
         #region Methods
 
         public ActionResult Index(DateTime? searchDate) {
+            try {
+                var a = 100;
+                var b = 0;
+                var c = a / b;
+            }
+            catch (Exception ex) {
+                _logger.LogError(444,ex, "Home Index");
+            }
+
             DateTime taskDay = searchDate ?? DateTime.Now;
             return View(taskDay);
         }
@@ -51,7 +66,7 @@ namespace CoralTimeAdmin.Controllers
 
         private async Task<IList<DayTasks>> GetDayTasks(DateTime date) {
             var @params = new DynamicParameters(
-                new { date = date.ToString("yyyy-MM-dd") }
+                new { dates = date.ToString("yyyy-MM-dd") }
             );
 
             IList<DayTasks> result = await _dapper.ExecProc<DayTasks>("GetEntriesForDay", @params);

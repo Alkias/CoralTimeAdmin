@@ -5,12 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using CoralTimeAdmin.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace CoralTimeAdmin.Helpers
 {
     public static class Extensions
     {
+       
         #region Strings
 
         /// <summary>
@@ -97,8 +100,11 @@ namespace CoralTimeAdmin.Helpers
         /// <returns></returns>
         public static string ToSqlDateTimeFormat(this string str)
         {
+            ILogger<ErrorHandling> _logger = EngineContext.Current.Resolve<ILogger<ErrorHandling>>();
+
             if (str.IsNullOrWhiteSpace())
                 return "";
+            
             try
             {
                 CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -108,6 +114,7 @@ namespace CoralTimeAdmin.Helpers
             }
             catch (Exception ex)
             {
+                _logger.LogError(444,ex, "ToSqlDateTimeFormat: {DateString}", str);
                 return "";
             }
         }
@@ -214,14 +221,16 @@ namespace CoralTimeAdmin.Helpers
         /// <param name="format">Optional: Date Format, Default: "dd/MM/yyyy"</param>
         /// <returns></returns>
         public static DateTime ToDate (this string dateString, string format = "dd/MM/yyyy") {
+            ILogger<ErrorHandling> _logger = EngineContext.Current.Resolve<ILogger<ErrorHandling>>();
+            
             var creationDateStr = dateString.Replace(" 00:00:00", "");
 
             try {
                 DateTime creationDate = DateTime.ParseExact(creationDateStr, format, CultureInfo.InvariantCulture);
                 return creationDate;
             }
-            catch (Exception e) {
-                Console.WriteLine(e);
+            catch (Exception ex) {
+                _logger.LogError(444, ex, "ToSqlDateTimeFormat: {DateString}", dateString);
                 throw;
             }
         }
@@ -320,14 +329,16 @@ namespace CoralTimeAdmin.Helpers
         /// <returns>the object in the given type or null if do not succeed.</returns>
         public static T ToOrNull<T>(this object obj) where T : class
         {
+            ILogger<ErrorHandling> _logger = EngineContext.Current.Resolve<ILogger<ErrorHandling>>();
+
             T result = null;
             try
             {
                 result = (T)obj;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                // TODO handle exception.
+                _logger.LogError(444, ex, "ToOrNull<T>");
             }
             return result;
         }
@@ -341,14 +352,16 @@ namespace CoralTimeAdmin.Helpers
         /// <returns>the object in the given type or the default value of the given type if do not succeed.</returns>
         public static T ToOrDefault<T>(this object obj)
         {
+            ILogger<ErrorHandling> _logger = EngineContext.Current.Resolve<ILogger<ErrorHandling>>();
+
             var result = default(T);
             try
             {
                 result = (T)obj;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                // TODO handle exception.
+                _logger.LogError(444, ex, "ToOrNull<T>");
             }
             return result;
         }

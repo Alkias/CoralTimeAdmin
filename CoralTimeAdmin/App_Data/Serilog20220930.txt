@@ -1,0 +1,103 @@
+2022-09-30 13:49:54.595 +03:00 [ERR] Application_Error
+System.InvalidOperationException: An error occurred when trying to create a controller of type 'CoralTimeAdmin.Controllers.HomeController'. Make sure that the controller has a parameterless public constructor. ---> Autofac.Core.DependencyResolutionException: An error occurred during the activation of a particular registration. See the inner exception for details. Registration: Activator = HomeController (ReflectionActivator), Services = [CoralTimeAdmin.Controllers.HomeController], Lifetime = Autofac.Core.Lifetime.CurrentScopeLifetime, Sharing = None, Ownership = OwnedByLifetimeScope ---> An error occurred during the activation of a particular registration. See the inner exception for details. Registration: Activator = EfRepository`1 (ReflectionActivator), Services = [CoralTimeAdmin.Repositories.IRepository`1[[CoralTimeAdmin.DAL.Entities.TimeEntries, CoralTimeAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]], Lifetime = Autofac.Core.Lifetime.CurrentScopeLifetime, Sharing = Shared, Ownership = OwnedByLifetimeScope ---> None of the constructors found with 'Autofac.Core.Activators.Reflection.DefaultConstructorFinder' on type 'CoralTimeAdmin.Repositories.EfRepository`1[CoralTimeAdmin.DAL.Entities.TimeEntries]' can be invoked with the available services and parameters:
+Cannot resolve parameter 'CoralTimeAdmin.Repositories.IDbContext context' of constructor 'Void .ctor(CoralTimeAdmin.Repositories.IDbContext)'. (See inner exception for details.) (See inner exception for details.) ---> Autofac.Core.DependencyResolutionException: An error occurred during the activation of a particular registration. See the inner exception for details. Registration: Activator = EfRepository`1 (ReflectionActivator), Services = [CoralTimeAdmin.Repositories.IRepository`1[[CoralTimeAdmin.DAL.Entities.TimeEntries, CoralTimeAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]], Lifetime = Autofac.Core.Lifetime.CurrentScopeLifetime, Sharing = Shared, Ownership = OwnedByLifetimeScope ---> None of the constructors found with 'Autofac.Core.Activators.Reflection.DefaultConstructorFinder' on type 'CoralTimeAdmin.Repositories.EfRepository`1[CoralTimeAdmin.DAL.Entities.TimeEntries]' can be invoked with the available services and parameters:
+Cannot resolve parameter 'CoralTimeAdmin.Repositories.IDbContext context' of constructor 'Void .ctor(CoralTimeAdmin.Repositories.IDbContext)'. (See inner exception for details.) ---> Autofac.Core.DependencyResolutionException: None of the constructors found with 'Autofac.Core.Activators.Reflection.DefaultConstructorFinder' on type 'CoralTimeAdmin.Repositories.EfRepository`1[CoralTimeAdmin.DAL.Entities.TimeEntries]' can be invoked with the available services and parameters:
+Cannot resolve parameter 'CoralTimeAdmin.Repositories.IDbContext context' of constructor 'Void .ctor(CoralTimeAdmin.Repositories.IDbContext)'.
+   at Autofac.Core.Activators.Reflection.ReflectionActivator.GetValidConstructorBindings(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Reflection.ReflectionActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Resolving.InstanceLookup.Activate(IEnumerable`1 parameters)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.InstanceLookup.Activate(IEnumerable`1 parameters)
+   at Autofac.Core.Resolving.InstanceLookup.<Execute>b__5_0()
+   at Autofac.Core.Lifetime.LifetimeScope.GetOrCreateAndShare(Guid id, Func`1 creator)
+   at Autofac.Core.Resolving.InstanceLookup.Execute()
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, IComponentRegistration registration, IEnumerable`1 parameters)
+   at Autofac.Core.Resolving.InstanceLookup.ResolveComponent(IComponentRegistration registration, IEnumerable`1 parameters)
+   at Autofac.Core.Activators.Reflection.AutowiringParameter.<>c__DisplayClass0_0.<CanSupplyValue>b__0()
+   at Autofac.Core.Activators.Reflection.ConstructorParameterBinding.Instantiate()
+   at Autofac.Core.Activators.Reflection.ReflectionActivator.ActivateInstance(IComponentContext context, IEnumerable`1 parameters)
+   at Autofac.Core.Resolving.InstanceLookup.Activate(IEnumerable`1 parameters)
+   --- End of inner exception stack trace ---
+   at Autofac.Core.Resolving.InstanceLookup.Activate(IEnumerable`1 parameters)
+   at Autofac.Core.Resolving.InstanceLookup.Execute()
+   at Autofac.Core.Resolving.ResolveOperation.GetOrCreateInstance(ISharingLifetimeScope currentOperationScope, IComponentRegistration registration, IEnumerable`1 parameters)
+   at Autofac.Core.Resolving.ResolveOperation.Execute(IComponentRegistration registration, IEnumerable`1 parameters)
+   at Autofac.Core.Lifetime.LifetimeScope.ResolveComponent(IComponentRegistration registration, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.TryResolveService(IComponentContext context, Service service, IEnumerable`1 parameters, Object& instance)
+   at Autofac.ResolutionExtensions.ResolveOptionalService(IComponentContext context, Service service, IEnumerable`1 parameters)
+   at Autofac.ResolutionExtensions.ResolveOptional(IComponentContext context, Type serviceType)
+   at Autofac.Integration.Mvc.AutofacDependencyResolver.GetService(Type serviceType)
+   at System.Web.Mvc.DefaultControllerFactory.DefaultControllerActivator.Create(RequestContext requestContext, Type controllerType)
+   --- End of inner exception stack trace ---
+   at System.Web.Mvc.DefaultControllerFactory.DefaultControllerActivator.Create(RequestContext requestContext, Type controllerType)
+   at System.Web.Mvc.DefaultControllerFactory.GetControllerInstance(RequestContext requestContext, Type controllerType)
+   at System.Web.Mvc.DefaultControllerFactory.CreateController(RequestContext requestContext, String controllerName)
+   at System.Web.Mvc.MvcHandler.ProcessRequestInit(HttpContextBase httpContext, IController& controller, IControllerFactory& factory)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContext httpContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, Object extraData)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+2022-09-30 13:59:17.360 +03:00 [ERR] ErrorHandling
+System.DivideByZeroException: Attempted to divide by zero.
+   at CoralTimeAdmin.Controllers.HomeController.Index(Nullable`1 searchDate) in E:\Data\Projects\_Tools\CoraTime-Tools\CoralTimeAdmin\CoralTimeAdmin\Controllers\HomeController.cs:line 41
+   at lambda_method(Closure , ControllerBase , Object[] )
+   at System.Web.Mvc.ActionMethodDispatcher.Execute(ControllerBase controller, Object[] parameters)
+   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c.<BeginInvokeSynchronousActionMethod>b__9_0(IAsyncResult asyncResult, ActionInvocation innerInvokeState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`2.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<InvokeActionMethodFilterAsynchronouslyRecursive>b__11_0()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<>c__DisplayClass11_1.<InvokeActionMethodFilterAsynchronouslyRecursive>b__2()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass7_0.<BeginInvokeActionMethodWithFilters>b__1(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass3_6.<BeginInvokeAction>b__3()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass3_1.<BeginInvokeAction>b__5(IAsyncResult asyncResult)
+2022-09-30 14:31:43.365 +03:00 [ERR] Home Index
+System.DivideByZeroException: Attempted to divide by zero.
+   at CoralTimeAdmin.Controllers.HomeController.Index(Nullable`1 searchDate) in E:\Data\Projects\_Tools\CoraTime-Tools\CoralTimeAdmin\CoralTimeAdmin\Controllers\HomeController.cs:line 48
+2022-09-30 14:38:41.748 +03:00 [ERR] Home Index
+System.DivideByZeroException: Attempted to divide by zero.
+   at CoralTimeAdmin.Controllers.HomeController.Index(Nullable`1 searchDate) in E:\Data\Projects\_Tools\CoraTime-Tools\CoralTimeAdmin\CoralTimeAdmin\Controllers\HomeController.cs:line 48
+2022-09-30 14:38:44.201 +03:00 [ERR] ExecProc: { procedure = GetEntriesForDay }
+System.Data.SqlClient.SqlException (0x80131904): Procedure or function 'GetEntriesForDay' expects parameter '@date', which was not supplied.
+   at System.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__180_0(Task`1 result)
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.ValidateEnd(Task task)
+   at Dapper.SqlMapper.<QueryAsync>d__33`1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at CoralTimeAdmin.Repositories.DapperRepository.<ExecProc>d__3`1.MoveNext() in E:\Data\Projects\_Tools\CoraTime-Tools\CoralTimeAdmin\CoralTimeAdmin\Repositories\DapperRepository.cs:line 37
+ClientConnectionId:d61510e4-47d7-402b-b671-cb6b025f40b6
+Error Number:201,State:4,Class:16
+2022-09-30 14:39:54.819 +03:00 [ERR] Home Index
+System.DivideByZeroException: Attempted to divide by zero.
+   at CoralTimeAdmin.Controllers.HomeController.Index(Nullable`1 searchDate) in E:\Data\Projects\_Tools\CoraTime-Tools\CoralTimeAdmin\CoralTimeAdmin\Controllers\HomeController.cs:line 48
+2022-09-30 14:39:57.492 +03:00 [ERR] ExecProc: GetEntriesForDay
+System.Data.SqlClient.SqlException (0x80131904): Procedure or function 'GetEntriesForDay' expects parameter '@date', which was not supplied.
+   at System.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__180_0(Task`1 result)
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.ValidateEnd(Task task)
+   at Dapper.SqlMapper.<QueryAsync>d__33`1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at CoralTimeAdmin.Repositories.DapperRepository.<ExecProc>d__3`1.MoveNext() in E:\Data\Projects\_Tools\CoraTime-Tools\CoralTimeAdmin\CoralTimeAdmin\Repositories\DapperRepository.cs:line 37
+ClientConnectionId:d04d76cf-60a9-432b-840d-9f1935f40b5b
+Error Number:201,State:4,Class:16

@@ -6,7 +6,7 @@ namespace CoralTimeAdmin.Models
 {
     public class DayTasks : ViewModelBase
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public string Project { get; set; }
 

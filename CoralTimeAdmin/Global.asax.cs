@@ -1,4 +1,7 @@
-﻿using System.Web;
+﻿using System;
+using System.Configuration;
+using System.Diagnostics;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -10,6 +13,11 @@ using CoralTimeAdmin.Fakes;
 using CoralTimeAdmin.Helpers;
 using CoralTimeAdmin.Repositories;
 using CoralTimeAdmin;
+using CoralTimeAdmin.Infrastructure;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 
 namespace CoralTimeAdmin
 {
@@ -23,17 +31,50 @@ namespace CoralTimeAdmin
             ModelBinders.Binders.Add(typeof(double), new DoubleModelBinder());
             ModelBinders.Binders.Add(typeof(double?), new DoubleModelBinder());
 
-            ConfigureAutofac();
+            //ConfigureAutofac();
+
+            // Configure SeriLog Logger
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.File(
+                    path: HttpContext.Current.Server.MapPath("~/App_Data/Serilog.txt"),
+                    rollingInterval: RollingInterval.Day)
+                .WriteTo.MSSqlServer(
+                    connectionString: ConfigurationManager.ConnectionStrings["SeriLogContext"].ConnectionString,
+                    sinkOptions: new MSSqlServerSinkOptions { TableName = "SeriLog" },
+                    sinkOptionsSection: null,
+                    appConfiguration: null,
+                    restrictedToMinimumLevel: LogEventLevel.Debug,
+                    formatProvider: null,
+                    columnOptions: null,
+                    columnOptionsSection: null,
+                    logEventFormatter: null)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)//To capture Information and error only  
+                .CreateLogger();
+
+            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+
+            //initialize engine context
+            EngineContext.Initialize(false);
 
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+            
+
+        }
+
+        protected void Application_Error(object sender, EventArgs e) {
+            Exception exc = Server.GetLastError();
+
+            Serilog.Log.Error(exc, "Application_Error");
         }
 
         private void ConfigureAutofac() {
             var builder = new ContainerBuilder();
+            builder.RegisterFilterProvider();
 
             //HTTP context and other related stuff
             builder.Register(
@@ -62,16 +103,21 @@ namespace CoralTimeAdmin
                 .InstancePerLifetimeScope();
 
             // Register Context
-            //builder.RegisterType<EmulatorContext>().InstancePerRequest();
-
-            //builder.RegisterType<CoralTimeContext>().InstancePerRequest();
-            //builder.Register<IDbContext>(c => new CoralTimeContext()).InstancePerLifetimeScope();
             var conString = WebConfigurationManager.ConnectionStrings["CoralTimeContext"].ConnectionString;
 
             builder.Register<IDbContext>(c => new CoralTimeContext(conString)).InstancePerLifetimeScope();
 
-            //controllers
-            builder.RegisterControllers(typeof(MvcApplication).Assembly);
+
+            #region Serilog resolve
+
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddSerilog(Log.Logger);
+
+            // register logger factory and generic logger
+            builder.RegisterInstance<ILoggerFactory>(loggerFactory);
+            builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+
+            #endregion
 
             #region Register all controllers for the assembly
 
@@ -82,6 +128,9 @@ namespace CoralTimeAdmin
             // InstancePerHttpRequest() - ASP.NET MVC will throw an exception if 
             // you try to reuse a controller instance for multiple requests. 
             //builder.RegisterControllers(typeof(MvcApplication).Assembly).InstancePerHttpRequest();
+
+            //controllers
+            builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
             #endregion
 

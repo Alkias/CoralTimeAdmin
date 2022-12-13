@@ -5,16 +5,20 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using CoralTimeAdmin.Controllers;
 using Dapper;
+using Microsoft.Extensions.Logging;
 
 namespace CoralTimeAdmin.Repositories
 {
     public class DapperRepository : IDapperRepository
     {
         private readonly String _connectionString;
+        private readonly ILogger<DapperRepository> _logger;
 
-        public DapperRepository() {
+        public DapperRepository(ILogger<DapperRepository> logger) {
             _connectionString = ConfigurationManager.ConnectionStrings["CoralTimeContext"].ConnectionString;
+            _logger = logger;
         }
 
         /// <summary>
@@ -40,8 +44,7 @@ namespace CoralTimeAdmin.Repositories
                 }
             }
             catch (Exception ex) {
-                //_logger.LogError(EventIds.InvalidSqlCommand, ex, $"Invalid sql command {storedProcedure}");
-                // Logging
+                _logger.LogError(444, ex, "ExecProc<T>: {Procedure}", storedProcedure);
                 return await Task.FromResult(new List<T>());
             }
         }
@@ -70,8 +73,7 @@ namespace CoralTimeAdmin.Repositories
                 }
             }
             catch (Exception ex) {
-                //_logger.LogError(EventIds.InvalidSqlCommand, ex, $"Invalid sql command {storedProcedure}");
-                // Logging
+                _logger.LogError(444, ex, "ExecProc: {Procedure}", storedProcedure);
             }
         }
 
@@ -98,8 +100,7 @@ namespace CoralTimeAdmin.Repositories
                 }
             }
             catch (Exception ex) {
-                //_logger.LogError(EventIds.InvalidSqlCommand, ex, $"Invalid sql command {sql}");
-                // Logging
+                _logger.LogError(444, ex, "sql");
                 return await Task.FromResult(new List<T>());
             }
         }
@@ -127,8 +128,7 @@ namespace CoralTimeAdmin.Repositories
                 }
             }
             catch (Exception ex) {
-                //_logger.LogError(EventIds.InvalidSqlCommand, ex, $"Invalid sql command {sql}");
-                // Logging
+                _logger.LogError(444, ex, "ExecScalarSql<T>");
                 return await Task.FromResult(default(T));
             }
         }
@@ -149,8 +149,7 @@ namespace CoralTimeAdmin.Repositories
                 }
             }
             catch (Exception ex) {
-                //_logger.LogError(EventIds.InvalidSqlCommand, ex, $"Invalid sql command {sql}");
-                // Logging
+                _logger.LogError(444, ex, "ExecNonQuery");
                 return await Task.FromResult(0);
             }
         }
